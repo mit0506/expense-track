@@ -11,7 +11,7 @@ from datetime import datetime
 try:
     import openai
     # read API key from environment variable
-    openai.api_key = os.environ.get('https://flashapi1.p.rapidapi.com/ig/child_comments/?nocors=false', '')
+    openai.api_key = os.environ.get('OPENAI_API_KEY', '')
 except ImportError:
     openai = None
 
