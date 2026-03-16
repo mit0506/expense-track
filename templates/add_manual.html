@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Add Expense - Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Add Expense</h1>
+    
+    <form method="post">
+        <div class="form-group">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" id="date" name="date" required class="form-input">
+        </div>
+
+        <div class="form-group">
+            <label for="merchant" class="form-label">Merchant</label>
+            <input type="text" id="merchant" name="merchant" placeholder="e.g., Dominos, Uber, Amazon" required class="form-input">
+        </div>
+
+        <div class="form-group">
+            <label for="amount" class="form-label">Amount</label>
+            <input type="number" id="amount" name="amount" step="0.01" placeholder="0.00" required class="form-input">
+        </div>
+
+        <div class="form-group">
+            <label for="category" class="form-label">Category</label>
+            <select id="category" name="category" required class="form-select">
+                <option value="">Select a category</option>
+                <option value="Food">Food</option>
+                <option value="Transport">Transport</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Utilities">Utilities</option>
+                <option value="Health">Health</option>
+                <option value="Education">Education</option>
+                <option value="Miscellaneous">Miscellaneous</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="payment_type" class="form-label">Payment Type</label>
+            <select id="payment_type" name="payment_type" required class="form-select">
+                <option value="">Select payment type</option>
+                <option value="Cash">Cash</option>
+                <option value="Card">Card</option>
+                <option value="UPI">UPI</option>
+                <option value="Net Banking">Net Banking</option>
+            </select>
+        </div>
+
+        <div class="form-helper">
+            <button type="submit" class="btn btn-primary">Add Expense</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
