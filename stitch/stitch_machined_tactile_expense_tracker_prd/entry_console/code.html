@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Machined Tactile - Entry Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#F2542D",
+                        "background": "#111113",
+                        "surface": "#1A1A1D",
+                        "surface-inset": "#0D0D0F",
+                        "text-main": "#EBEBEB",
+                        "muted": "#84848B",
+                        "accent": "#00E5FF",
+                        "background-light": "#f8f6f5",
+                        "background-dark": "#111113",
+                    },
+                    fontFamily: {
+                        "display": ["Archivo", "sans-serif"],
+                        "sans": ["Archivo", "sans-serif"],
+                        "mono": ["Space Mono", "monospace"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "sm": "0.125rem",
+                        "md": "0.25rem",
+                        "lg": "0.25rem",
+                        "xl": "0.25rem",
+                        "full": "0.25rem",
+                    },
+                    boxShadow: {
+                        "raised": "0 4px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)",
+                        "pressed": "inset 0 2px 4px rgba(0,0,0,0.6)",
+                        "input": "inset 0 2px 4px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05)",
+                        "modal": "0 24px 48px rgba(0,0,0,0.8)",
+                    },
+                    transitionTimingFunction: {
+                        'machined': 'cubic-bezier(0.16, 1, 0.3, 1)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #111113;
+            background-image: linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* Custom scrollbar for horizontal dial */
+        .category-dial::-webkit-scrollbar {
+            height: 4px;
+        }
+        .category-dial::-webkit-scrollbar-track {
+            background: #0D0D0F;
+        }
+        .category-dial::-webkit-scrollbar-thumb {
+            background: #84848B;
+            border-radius: 2px;
+        }
+
+        /* Tactile active states */
+        .tactile-btn:active {
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+            transform: translateY(1px);
+            transition: all 0ms;
+        }
+        .tactile-btn {
+            transition: all 100ms ease-out;
+        }
+    </style>
+</head>
+<body class="bg-background-dark min-h-screen flex items-center justify-center p-4 font-sans text-text-main antialiased">
+<!-- Modal Overlay Container -->
+<div class="w-full max-w-[480px] bg-surface rounded shadow-modal border border-white/5 flex flex-col overflow-hidden relative" style="box-shadow: 0 24px 48px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08);">
+<!-- Header -->
+<header class="flex items-center justify-between border-b border-white/5 px-6 py-4 bg-surface">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-[20px]">toll</span>
+<h2 class="text-text-main text-[24px] font-semibold tracking-[-0.02em] leading-none uppercase">Log Expense</h2>
+</div>
+<button class="flex items-center justify-center size-8 bg-surface-inset text-muted hover:text-text-main rounded-sm shadow-input transition-colors cursor-pointer tactile-btn">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</header>
+<!-- Amount Input -->
+<div class="px-6 py-6 border-b border-white/5">
+<label class="block mb-2 font-mono text-[11px] uppercase tracking-[0.05em] text-muted">Amount_USD</label>
+<div class="relative w-full h-[64px] bg-surface-inset rounded-sm shadow-input flex items-center px-4 overflow-hidden border border-white/5">
+<span class="font-mono text-[24px] text-muted mr-2 opacity-50">$</span>
+<input class="w-full bg-transparent border-none text-accent font-mono text-[48px] tracking-tight focus:ring-0 focus:outline-none p-0 h-full placeholder:text-muted/30" placeholder="0.00" readonly="" type="text" value="342.50"/>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+<span class="material-symbols-outlined text-muted text-[16px]">backspace</span>
+</div>
+</div>
+</div>
+<!-- Category Dial -->
+<div class="px-0 py-4 border-b border-white/5 bg-surface">
+<div class="px-6 mb-2">
+<label class="block font-mono text-[11px] uppercase tracking-[0.05em] text-muted">Category_Select</label>
+</div>
+<div class="flex gap-2 px-6 overflow-x-auto category-dial pb-2">
+<button class="shrink-0 h-10 px-4 bg-primary text-background font-mono text-[13px] font-bold uppercase rounded-sm shadow-raised tactile-btn flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">restaurant</span>
+                    Food
+                </button>
+<button class="shrink-0 h-10 px-4 bg-surface-inset text-muted hover:text-text-main font-mono text-[13px] uppercase rounded-sm shadow-input tactile-btn flex items-center gap-2 border border-white/5">
+<span class="material-symbols-outlined text-[16px]">directions_car</span>
+                    Transport
+                </button>
+<button class="shrink-0 h-10 px-4 bg-surface-inset text-muted hover:text-text-main font-mono text-[13px] uppercase rounded-sm shadow-input tactile-btn flex items-center gap-2 border border-white/5">
+<span class="material-symbols-outlined text-[16px]">construction</span>
+                    Gear
+                </button>
+<button class="shrink-0 h-10 px-4 bg-surface-inset text-muted hover:text-text-main font-mono text-[13px] uppercase rounded-sm shadow-input tactile-btn flex items-center gap-2 border border-white/5">
+<span class="material-symbols-outlined text-[16px]">dns</span>
+                    Software
+                </button>
+<button class="shrink-0 h-10 px-4 bg-surface-inset text-muted hover:text-text-main font-mono text-[13px] uppercase rounded-sm shadow-input tactile-btn flex items-center gap-2 border border-white/5">
+<span class="material-symbols-outlined text-[16px]">subscriptions</span>
+                    Subs
+                </button>
+</div>
+</div>
+<!-- Description Input -->
+<div class="px-6 py-4 border-b border-white/5">
+<label class="block mb-2 font-mono text-[11px] uppercase tracking-[0.05em] text-muted">Memo_Optional</label>
+<input class="w-full h-10 bg-surface-inset rounded-sm shadow-input border border-white/5 text-text-main font-mono text-[13px] px-3 focus:ring-1 focus:ring-accent focus:outline-none placeholder:text-muted/50" placeholder="ENTER_DETAILS..." type="text"/>
+</div>
+<!-- Numpad & Commit -->
+<div class="p-6 bg-[#161619]">
+<div class="grid grid-cols-3 gap-[2px] mb-6">
+<!-- Row 1 -->
+<button class="h-[64px] bg-surface rounded-sm shadow-raised text-text-main font-mono text-[24px] flex items-center justify-center tactile-btn border border-white/5">1</button>
+<button class="h-[64px] bg-surface rounded-sm shadow-raised text-text-main font-mono text-[24px] flex items-center justify-center tactile-btn border border-white/5">2</button>
+<button class="h-[64px] bg-surface rounded-sm shadow-raised text-text-main font-mono text-[24px] flex items-center justify-center tactile-btn border border-white/5">3</button>
+<!-- Row 2 -->
+<button class="h-[64px] bg-surface rounded-sm shadow-raised text-text-main font-mono text-[24px] flex items-center justify-center tactile-btn border border-white/5">4</button>
+<button class="h-[64px] bg-surface rounded-sm shadow-raised text-text-main font-mono text-[24px] flex items-center justify-center tactile-btn border border-white/5">5</button>
+<button class="h-[64px] bg-surface rounded-sm shadow-raised text-text-main font-mono text-[24px] flex items-center justify-center tactile-btn border border-white/5">6</button>
+<!-- Row 3 -->
+<button class="h-[64px] bg-surface rounded-sm shadow-raised text-text-main font-mono text-[24px] flex items-center justify-center tactile-btn border border-white/5">7</button>
+<button class="h-[64px] bg-surface rounded-sm shadow-raised text-text-main font-mono text-[24px] flex items-center justify-center tactile-btn border border-white/5">8</button>
+<button class="h-[64px] bg-surface rounded-sm shadow-raised text-text-main font-mono text-[24px] flex items-center justify-center tactile-btn border border-white/5">9</button>
+<!-- Row 4 -->
+<button class="h-[64px] bg-surface rounded-sm shadow-raised text-text-main font-mono text-[24px] flex items-center justify-center tactile-btn border border-white/5 text-muted">.</button>
+<button class="h-[64px] bg-surface rounded-sm shadow-raised text-text-main font-mono text-[24px] flex items-center justify-center tactile-btn border border-white/5">0</button>
+<button class="h-[64px] bg-surface rounded-sm shadow-raised text-text-main font-mono text-[24px] flex items-center justify-center tactile-btn border border-white/5 text-primary">
+<span class="material-symbols-outlined">check</span>
+</button>
+</div>
+<!-- Commit Button -->
+<button class="w-full h-14 bg-primary text-background font-mono font-bold text-[14px] uppercase tracking-[0.05em] rounded-sm shadow-raised flex items-center justify-center gap-2 tactile-btn active:translate-y-[2px]">
+<span class="material-symbols-outlined text-[18px]">data_check</span>
+                Commit_Transaction
+            </button>
+</div>
+</div>
+</body></html>

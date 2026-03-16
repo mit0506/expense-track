@@ -1,43 +1,99 @@
 {% extends "base.html" %}
 
-{% block title %}Profile - Expense Tracker{% endblock %}
+{% block title %}Profile Settings - Machined Tactile{% endblock %}
+{% block header_title %}User_Config // Profile{% endblock %}
 
 {% block content %}
-<div class="form-container">
-    <h1>Profile Settings</h1>
-    
-    <form method="post" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="avatar" class="form-label">Avatar</label>
-            <input type="file" id="avatar" name="avatar" accept="image/*" class="form-input">
-            {% if profile.avatar %}
-            <div style="margin-top: var(--spacing-lg);">
-                <img src="{{ url_for('static', filename='avatars/' + profile.avatar) }}" alt="Current avatar" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--color-primary-600); object-fit: cover;">
+<div class="max-w-[700px] mx-auto w-full">
+    <div class="machined-plate rounded-md overflow-hidden p-4 md:p-8 shadow-2xl relative">
+        <!-- LED Accent -->
+        <div class="absolute top-0 left-0 w-full h-[2px] bg-primary"></div>
+        
+        <header class="mb-10 flex justify-between items-start">
+            <div>
+                <h2 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-muted mb-1">Module // Identity_Management</h2>
+                <p class="text-sm text-text-main font-medium">Configure system parameters and user metadata</p>
             </div>
-            {% endif %}
-        </div>
+        </header>
 
-        <div class="form-group">
-            <label for="name" class="form-label">Name</label>
-            <input type="text" id="name" name="name" value="{{ profile.name }}" required class="form-input">
-        </div>
+        <form method="POST" enctype="multipart/form-data" class="flex flex-col gap-8">
+            <!-- Profile Identity -->
+            <div class="flex flex-col md:flex-row gap-8 items-center md:items-start">
+                <div class="relative group">
+                    <div class="w-32 h-32 rounded-sm machined-plate overflow-hidden border-2 border-white/5 group-hover:border-accent-cyan/50 transition-colors">
+                        <img id="avatar-preview" src="{{ url_for('static', filename='avatars/' + (profile.avatar or 'default_avatar.png')) }}" 
+                             alt="Avatar" class="w-full h-full object-cover">
+                    </div>
+                    <label class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                        <span class="material-symbols-outlined text-white text-[24px]">photo_camera</span>
+                        <span class="text-[8px] font-mono text-white uppercase mt-1">Upload_ID</span>
+                        <input type="file" name="avatar" id="avatar-input" accept="image/*" class="hidden">
+                    </label>
+                </div>
 
-        <div class="form-group">
-            <label for="monthly_income" class="form-label">Monthly Income</label>
-            <input type="number" step="0.01" id="monthly_income" name="monthly_income" value="{{ profile.monthly_income }}" required class="form-input">
-            <span class="form-hint">Enter your gross monthly income in rupees</span>
-        </div>
+                <div class="flex-1 flex flex-col gap-6 w-full">
+                    <!-- Name -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Identity_Name</label>
+                        <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
+                            <input type="text" name="name" value="{{ profile.name }}" required 
+                                   class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0" 
+                                   placeholder="ENTER_NAME...">
+                        </div>
+                    </div>
 
-        <div class="form-group">
-            <label for="monthly_target" class="form-label">Monthly Spending Target</label>
-            <input type="number" step="0.01" id="monthly_target" name="monthly_target" value="{{ profile.monthly_target }}" required class="form-input">
-            <span class="form-hint">Set a spending limit to receive alerts when exceeded</span>
-        </div>
+                    <!-- Metrics Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Monthly Income -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Monthly_Income (INR)</label>
+                            <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
+                                <span class="text-text-muted font-mono text-xs mr-2">₹</span>
+                                <input type="number" step="0.01" name="monthly_income" value="{{ profile.monthly_income }}" required 
+                                       class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0 tabular-nums">
+                            </div>
+                        </div>
 
-        <div class="form-helper">
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
-        </div>
-    </form>
+                        <!-- Spending Target -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Spending_Limit (INR)</label>
+                            <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
+                                <span class="text-text-muted font-mono text-xs mr-2">₹</span>
+                                <input type="number" step="0.01" name="monthly_target" value="{{ profile.monthly_target }}" required 
+                                       class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0 tabular-nums">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button Area -->
+            <div class="border-t border-white/5 pt-8 flex flex-col sm:flex-row gap-4">
+                <button type="submit" class="machined-button flex-1 h-14 bg-primary text-text-main font-mono font-bold uppercase tracking-widest flex items-center justify-center gap-2 group hover:bg-primary/90 transition-colors">
+                    <span class="material-symbols-outlined group-active:translate-y-[1px]">sync_alt</span>
+                    Update Configuration
+                </button>
+                <a href="{{ url_for('index') }}" class="machined-plate flex items-center justify-center px-6 h-14 text-text-muted hover:text-text-main font-mono text-[10px] uppercase tracking-wider transition-colors">
+                    Abort
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
+
+<script>
+    const avatarInput = document.getElementById('avatar-input');
+    const preview = document.getElementById('avatar-preview');
+
+    avatarInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 {% endblock %}
