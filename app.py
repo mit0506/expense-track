@@ -96,15 +96,31 @@ def index():
             target_exceeded = True
     return render_template('index.html', expenses=expenses, target_exceeded=target_exceeded, monthly_total=monthly_total)
 
-# make profile data available globally
+# make profile data and monthly total available globally
 @app.context_processor
-def inject_profile():
+def inject_global_data():
     profile = UserProfile.query.first()
     if not profile:
-        profile = UserProfile(name='User', monthly_income=app.config.get('MONTHLY_INCOME',0))
+        profile = UserProfile(name='User', monthly_income=app.config.get('MONTHLY_INCOME', 0))
         db.session.add(profile)
         db.session.commit()
-    return {'user_profile': profile}
+    
+    # Calculate monthly total once for all templates
+    monthly_total = 0.0
+    expenses = Expense.query.all()
+    today = datetime.today()
+    prefix = today.strftime('%Y-%m')
+    for exp in expenses:
+        if exp.date.startswith(prefix):
+            try:
+                monthly_total += float(exp.amount)
+            except (ValueError, TypeError):
+                pass
+                
+    return {
+        'user_profile': profile,
+        'monthly_total': monthly_total
+    }
 
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
