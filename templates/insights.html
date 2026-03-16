@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Insights - Expense Tracker{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: var(--spacing-3xl);">
+    <h1>Spending Insights</h1>
+    <p style="color: var(--color-text-secondary); font-size: var(--font-size-lg); margin: var(--spacing-lg) 0 0 0;">Analysis of your spending habits and recommendations</p>
+</div>
+
+<div class="insight-section">
+    <h2 style="margin-top: 0;">Overview</h2>
+    <p style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--color-primary-600); margin: var(--spacing-lg) 0;">Total Spending: ₹{{ insights.total_spending|round(2) }}</p>
+    
+    <h3 style="color: var(--color-primary-600); margin-top: var(--spacing-2xl);">Category Breakdown</h3>
+    <ul style="list-style: none; padding: 0; margin: 0;">
+    {% for category, amount in insights.category_breakdown.items() %}
+        <li style="padding: var(--spacing-md) 0; color: var(--color-text-secondary);">
+            <strong>{{ category }}</strong>: ₹{{ amount|round(2) }}
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+
+{% if insights.trends %}
+<div class="insight-section">
+    <h2 style="margin-top: 0; color: var(--color-primary-600);">Spending Trends</h2>
+    <ul style="list-style: none; padding: 0; margin: 0;">
+    {% for trend in insights.trends %}
+        <li style="padding: var(--spacing-md) 0; padding-left: var(--spacing-2xl); position: relative; color: var(--color-text-secondary);">
+            <span style="position: absolute; left: 0; color: var(--color-primary-600);">→</span>
+            {{ trend }}
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if insights.warnings %}
+<div class="alert alert-warning">
+    <div class="alert-icon">!</div>
+    <div class="alert-content" style="margin: 0;">
+        <h3 style="margin-top: 0;">Financial Alerts</h3>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+        {% for warning in insights.warnings %}
+            <li style="padding: var(--spacing-sm) 0;">{{ warning }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+
+{% if insights.recommendations %}
+<div class="insight-section">
+    <h2 style="margin-top: 0; color: var(--color-success);">Recommendations</h2>
+    <ul style="list-style: none; padding: 0; margin: 0;">
+    {% for recommendation in insights.recommendations %}
+        <li style="padding: var(--spacing-md) 0; padding-left: var(--spacing-2xl); position: relative; color: var(--color-text-secondary);">
+            <span style="position: absolute; left: 0; color: var(--color-success);">✓</span>
+            {{ recommendation }}
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<div class="chat-container">
+    <h3 style="margin-top: 0; margin-bottom: var(--spacing-lg);">Expense Assistant</h3>
+    <div id="chatBox" class="chat-box"></div>
+    <div class="chat-input-group">
+        <input type="text" id="chatInput" placeholder="Ask about your expenses...">
+        <button onclick="sendQuestion()" class="btn btn-primary">Send</button>
+    </div>
+</div>
+
+<a href="{{ url_for('index') }}" class="back-link">Back to Dashboard</a>
+
+<script>
+    function sendQuestion() {
+        const input = document.getElementById('chatInput');
+        const question = input.value.trim();
+        if (!question) return;
+        const box = document.getElementById('chatBox');
+        const userMsg = document.createElement('div');
+        userMsg.className = 'chat-message user';
+        userMsg.textContent = question;
+        box.appendChild(userMsg);
+        input.value = '';
+        
+        fetch('/chat', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({question: question})
+        })
+        .then(res=>res.json())
+        .then(data=>{
+            const botMsg = document.createElement('div');
+            botMsg.className = 'chat-message bot';
+            botMsg.textContent = data.answer;
+            box.appendChild(botMsg);
+            box.scrollTop = box.scrollHeight;
+        })
+        .catch(err=>{
+            const errMsg = document.createElement('div');
+            errMsg.className = 'chat-message bot';
+            errMsg.textContent = 'Error: Unable to process your question.';
+            box.appendChild(errMsg);
+        });
+    }
+
+    document.getElementById('chatInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendQuestion();
+    });
+</script>
+{% endblock %}
+            box.appendChild(botMsg);
+            box.scrollTop = box.scrollHeight;
+        })
+        .catch(err=>console.error(err));
+    }
+
+</script>
+{% endblock %}

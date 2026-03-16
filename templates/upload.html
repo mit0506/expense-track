@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Scan Receipt - Expense Tracker{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: var(--spacing-3xl);">
+    <h1>Scan Receipt</h1>
+    <p style="color: var(--color-text-secondary); font-size: var(--font-size-lg); margin: var(--spacing-lg) 0 0 0;">Upload a receipt image to automatically extract expense details</p>
+</div>
+
+{% if error %}
+<div class="alert alert-danger">
+    <div class="alert-icon">✕</div>
+    <div class="alert-content">
+        <h3>Unable to Process Receipt</h3>
+        <p>{{ error }}</p>
+        
+        {% if "Tesseract" in error %}
+        <details style="margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 1px solid currentColor;">
+            <summary style="cursor: pointer; font-weight: var(--font-weight-semibold);">How to fix this</summary>
+            <div style="margin-top: var(--spacing-lg);">
+                <p>Tesseract OCR is not installed. You have two options:</p>
+                <ol style="margin: var(--spacing-md) 0; padding-left: var(--spacing-2xl);">
+                    <li><strong>Use <a href="{{ url_for('add_manual') }}" style="color: var(--color-primary-600); text-decoration: underline;">manual entry</a></strong> to enter receipt details by hand</li>
+                    <li>Install Tesseract OCR on your system to enable scanning</li>
+                </ol>
+            </div>
+        </details>
+        {% else %}
+        <p style="margin-top: var(--spacing-lg);">You can also <a href="{{ url_for('add_manual') }}" style="color: var(--color-primary-600); text-decoration: underline;">enter the expense manually</a> if the scan doesn't work.</p>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<div class="form-container">
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="receipt" class="form-label">Receipt Image</label>
+            <input type="file" id="receipt" name="receipt" accept="image/*" required class="form-input">
+            <span class="form-hint">Supported formats: JPG, PNG, BMP, GIF (Max 10MB)</span>
+        </div>
+
+        <div style="background: var(--color-neutral-100); border-left: 4px solid var(--color-primary-600); padding: var(--spacing-lg); border-radius: var(--radius-md); margin-bottom: var(--spacing-2xl);">
+            <h4 style="color: var(--color-text-primary); margin-bottom: var(--spacing-md); margin-top: 0;">Tips for Best Results</h4>
+            <ul style="margin: 0; padding-left: var(--spacing-2xl); color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+                <li>Ensure receipt text is clear and readable</li>
+                <li>Good lighting without glare or shadows</li>
+                <li>Keep receipt fully in frame</li>
+                <li>Receipt should show amount and merchant name</li>
+            </ul>
+        </div>
+
+        <div class="form-helper">
+            <button type="submit" class="btn btn-primary">Upload &amp; Process</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<a href="{{ url_for('index') }}" class="back-link">Back to Dashboard</a>
+
+<script>
+    document.getElementById('receipt').addEventListener('change', function(e) {
+        const fileName = e.target.files[0]?.name;
+        if (fileName) {
+            const input = document.getElementById('receipt');
+            input.title = 'Selected: ' + fileName;
+        }
+    });
+</script>
+{% endblock %}

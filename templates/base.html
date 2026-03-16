@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Expense Tracker{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='design-tokens.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style-refactored.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{{ url_for('index') }}" class="navbar-brand">ExpenseTracker</a>
+            <ul class="navbar-menu">
+                <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('add_manual') }}">Add Expense</a></li>
+                <li><a href="{{ url_for('visualize') }}">Analytics</a></li>
+                <li><a href="{{ url_for('insights') }}">Insights</a></li>
+            </ul>
+            <a href="{{ url_for('profile') }}" class="navbar-profile">
+                {% if user_profile and user_profile.avatar %}
+                <img src="{{ url_for('static', filename='avatars/' + user_profile.avatar) }}" alt="Profile Avatar" class="profile-avatar">
+                {% else %}
+                <div class="profile-avatar" style="background: #2b7de9; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">{{ (user_profile.name if user_profile else 'U')[0] }}</div>
+                {% endif %}
+                <span class="profile-name">{{ user_profile.name if user_profile else 'User' }}</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</body>
+</html>

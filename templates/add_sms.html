@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Add Expense from SMS - Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Add from SMS</h1>
+    <p style="text-align: center; color: var(--color-text-secondary); margin-bottom: var(--spacing-2xl);">Paste your transaction SMS and we'll extract the expense details automatically</p>
+    
+    <form method="post">
+        <div class="form-group">
+            <label for="sms_text" class="form-label">Transaction SMS</label>
+            <textarea id="sms_text" name="sms_text" rows="6" placeholder="Paste your SMS here...&#10;Example: Your UPI payment of Rs. 450 to Dominos Pizza on 12/03/2026 was successful" required class="form-textarea"></textarea>
+        </div>
+
+        <div class="form-helper">
+            <button type="submit" class="btn btn-primary">Extract &amp; Add</button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
