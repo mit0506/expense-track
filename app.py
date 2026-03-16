@@ -237,16 +237,50 @@ def chat():
         if target:
             user_prompt += f" Monthly target: {target:.2f}."
         try:
-            completion = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                max_tokens=150,
-                temperature=0.5,
-            )
-            answer = completion.choices[0].message['content'].strip()
+            # Support both legacy `openai.ChatCompletion.create` and the newer
+            # `OpenAI` client (client.chat.completions.create) depending on
+            # installed `openai` package version.
+            ChatCompletion = getattr(openai, 'ChatCompletion', None)
+            if ChatCompletion:
+                completion = ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    max_tokens=150,
+                    temperature=0.5,
+                )
+                # older clients return dict-like message
+                try:
+                    answer = completion.choices[0].message['content'].strip()
+                except Exception:
+                    try:
+                        answer = completion.choices[0].text.strip()
+                    except Exception:
+                        answer = str(completion)
+            else:
+                OpenAI = getattr(openai, 'OpenAI', None)
+                if OpenAI:
+                    client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY', openai.api_key or None))
+                    resp = client.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_prompt},
+                        ],
+                        max_tokens=150,
+                        temperature=0.5,
+                    )
+                    try:
+                        answer = resp.choices[0].message.content.strip()
+                    except Exception:
+                        try:
+                            answer = resp.choices[0].message['content'].strip()
+                        except Exception:
+                            answer = str(resp)
+                else:
+                    answer = "AI client not available"
         except Exception as e:
             answer = f"AI service error: {str(e)}"
     else:
@@ -277,9 +311,12 @@ def filter_by_date_range(expense_data, start_date, end_date):
     from datetime import datetime
     filtered = []
     for expense in expense_data:
+        date_str = expense.get('date') if isinstance(expense, dict) else getattr(expense, 'date', '')
+        if not date_str:
+            continue
         try:
-            expense_date = datetime.strptime(expense['date'], '%Y-%m-%d')
-        except ValueError:
+            expense_date = datetime.strptime(date_str, '%Y-%m-%d')
+        except (ValueError, TypeError):
             continue
         if start_date <= expense_date.date() <= end_date:
             filtered.append(expense)
@@ -305,9 +342,12 @@ def get_visualization_data(period):
         filtered_data = expense_data
     else:
         for expense in expense_data:
+            date_str = expense.get('date') if isinstance(expense, dict) else getattr(expense, 'date', '')
+            if not date_str:
+                continue
             try:
-                expense_date = datetime.strptime(expense['date'], '%Y-%m-%d')
-            except ValueError:
+                expense_date = datetime.strptime(date_str, '%Y-%m-%d')
+            except (ValueError, TypeError):
                 continue
 
             if period == 'daily':
@@ -449,9 +489,12 @@ def generate_insights():
     last_month_spending = defaultdict(float)
 
     for e in expense_data:
+        date_str = e.get('date') if isinstance(e, dict) else getattr(e, 'date', '')
+        if not date_str:
+            continue
         try:
-            expense_date = datetime.strptime(e['date'], '%Y-%m-%d')
-        except ValueError:
+            expense_date = datetime.strptime(date_str, '%Y-%m-%d')
+        except (ValueError, TypeError):
             continue
 
         if expense_date >= this_week_start:
