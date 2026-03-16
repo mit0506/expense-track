@@ -1,91 +1,144 @@
 {% extends "base.html" %}
 
-{% block title %}Insights - Expense Tracker{% endblock %}
+{% block title %}System Insights - Machined Tactile{% endblock %}
+{% block header_title %}Analytics // Neural_Insights{% endblock %}
 
 {% block content %}
-<div style="text-align: center; margin-bottom: var(--spacing-3xl);">
-    <h1>Spending Insights</h1>
-    <p style="color: var(--color-text-secondary); font-size: var(--font-size-lg); margin: var(--spacing-lg) 0 0 0;">Analysis of your spending habits and recommendations</p>
-</div>
+<div class="flex flex-col gap-8">
+    <!-- Analysis Metrics -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Overview Node -->
+        <div class="machined-plate p-6 rounded-md relative group overflow-hidden">
+            <div class="flex justify-between items-start mb-6">
+                <h2 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-muted">Module // Aggregate_Analysis</h2>
+                <span class="material-symbols-outlined text-text-muted text-[18px]">query_stats</span>
+            </div>
+            <div class="flex flex-col gap-1">
+                <span class="text-[10px] font-mono text-text-muted uppercase tracking-widest">Total Volume Output</span>
+                <span class="text-4xl font-mono font-bold text-text-main tabular-nums">₹{{ "%.2f"|format(insights.total_spending) }}</span>
+            </div>
+            <div class="mt-8 border-t border-white/5 pt-4">
+                <h3 class="text-[10px] font-mono text-text-muted uppercase tracking-widest mb-4">Node Allocation</h3>
+                <div class="flex flex-col gap-3">
+                    {% for category, amount in insights.category_breakdown.items() %}
+                    <div class="flex items-center gap-3">
+                        <div class="w-20 text-[9px] font-mono text-text-muted uppercase truncate">{{ category }}</div>
+                        <div class="flex-1 h-1 machined-inset rounded-full overflow-hidden">
+                            {% set cat_percent = (amount / insights.total_spending * 100) if insights.total_spending > 0 else 0 %}
+                            {% set bar_width = cat_percent if cat_percent <= 100 else 100 %}
+                            <div class="h-full bg-accent-cyan opacity-40 group-hover:opacity-100 transition-opacity" style="width: {{ bar_width }}%;"></div>
+                        </div>
+                        <div class="w-16 text-right text-[10px] font-mono text-text-main tabular-nums">₹{{ "%.2f"|format(amount) }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="absolute top-0 left-0 w-full h-[1px] bg-accent-cyan opacity-20"></div>
+        </div>
 
-<div class="insight-section">
-    <h2 style="margin-top: 0;">Overview</h2>
-    <p style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); color: var(--color-primary-600); margin: var(--spacing-lg) 0;">Total Spending: ₹{{ insights.total_spending|round(2) }}</p>
-    
-    <h3 style="color: var(--color-primary-600); margin-top: var(--spacing-2xl);">Category Breakdown</h3>
-    <ul style="list-style: none; padding: 0; margin: 0;">
-    {% for category, amount in insights.category_breakdown.items() %}
-        <li style="padding: var(--spacing-md) 0; color: var(--color-text-secondary);">
-            <strong>{{ category }}</strong>: ₹{{ amount|round(2) }}
-        </li>
-    {% endfor %}
-    </ul>
-</div>
+        <!-- System Warnings & Health -->
+        <div class="flex flex-col gap-6">
+            {% if insights.warnings %}
+            <div class="machined-plate p-6 rounded-md border-primary/20 bg-primary/5 relative">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-primary led-active">warning</span>
+                    <h2 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-main">Anomaly_Detected</h2>
+                </div>
+                <ul class="flex flex-col gap-3">
+                    {% for warning in insights.warnings %}
+                    <li class="flex items-start gap-2">
+                        <span class="text-primary text-[10px] font-mono mt-0.5">>></span>
+                        <span class="text-[11px] font-mono text-text-muted uppercase leading-relaxed">{{ warning }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="absolute top-0 left-0 w-full h-[1px] bg-primary opacity-40"></div>
+            </div>
+            {% endif %}
 
-{% if insights.trends %}
-<div class="insight-section">
-    <h2 style="margin-top: 0; color: var(--color-primary-600);">Spending Trends</h2>
-    <ul style="list-style: none; padding: 0; margin: 0;">
-    {% for trend in insights.trends %}
-        <li style="padding: var(--spacing-md) 0; padding-left: var(--spacing-2xl); position: relative; color: var(--color-text-secondary);">
-            <span style="position: absolute; left: 0; color: var(--color-primary-600);">→</span>
-            {{ trend }}
-        </li>
-    {% endfor %}
-    </ul>
-</div>
-{% endif %}
+            {% if insights.recommendations %}
+            <div class="machined-plate p-6 rounded-md relative">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="material-symbols-outlined text-accent-cyan">bolt</span>
+                    <h2 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-main">Optimization_Protocols</h2>
+                </div>
+                <ul class="flex flex-col gap-3">
+                    {% for rec in insights.recommendations %}
+                    <li class="flex items-start gap-2 group">
+                        <span class="text-accent-cyan text-[10px] font-mono mt-0.5 group-hover:translate-x-1 transition-transform">-></span>
+                        <span class="text-[11px] font-mono text-text-muted uppercase leading-relaxed group-hover:text-text-main transition-colors">{{ rec }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 
-{% if insights.warnings %}
-<div class="alert alert-warning">
-    <div class="alert-icon">!</div>
-    <div class="alert-content" style="margin: 0;">
-        <h3 style="margin-top: 0;">Financial Alerts</h3>
-        <ul style="list-style: none; padding: 0; margin: 0;">
-        {% for warning in insights.warnings %}
-            <li style="padding: var(--spacing-sm) 0;">{{ warning }}</li>
-        {% endfor %}
-        </ul>
+    <!-- AI Terminal -->
+    <div class="machined-plate rounded-md overflow-hidden flex flex-col h-[400px] md:h-[500px]">
+        <header class="h-10 border-b border-white/10 bg-surface-inset flex items-center justify-between px-4 shrink-0">
+            <div class="flex items-center gap-2">
+                <div class="hidden sm:flex gap-1">
+                    <div class="w-2 h-2 rounded-full bg-white/10"></div>
+                    <div class="w-2 h-2 rounded-full bg-white/10"></div>
+                    <div class="w-2 h-2 rounded-full bg-white/10"></div>
+                </div>
+                <h3 class="text-[9px] font-mono text-text-muted uppercase tracking-widest sm:ml-2">Neural_Processor // Terminal v2.1</h3>
+            </div>
+            <span class="text-[8px] font-mono text-accent-cyan bg-accent-cyan/10 px-2 py-0.5 rounded-sm uppercase">Active_Session</span>
+        </header>
+        
+        <div id="chatBox" class="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-4 font-mono text-[11px] uppercase scroll-smooth bg-black/20">
+            <div class="text-accent-cyan opacity-80">
+                [SYSTEM] INITIALIZING NEURAL INTERFACE...<br>
+                [SYSTEM] INDEXING TRANSACTION LEDGER... SUCCESS.<br>
+                [SYSTEM] READY FOR NATURAL LANGUAGE QUERIES.
+            </div>
+            <div class="flex gap-3">
+                <span class="text-primary font-bold shrink-0">ASSISTANT_BOT >></span>
+                <span class="text-text-muted">How can I assist with your financial oversight today?</span>
+            </div>
+        </div>
+
+        <div class="p-3 md:p-4 bg-surface-inset border-t border-white/10 flex gap-2 md:gap-4 items-center">
+            <span class="text-accent-cyan font-mono text-xs font-bold hidden sm:inline">REQ_INP_</span>
+            <input type="text" id="chatInput" 
+                   class="bg-transparent border-none text-xs font-mono text-text-main flex-1 focus:outline-none focus:ring-0 p-0 placeholder:text-text-muted/30" 
+                   placeholder="COMMAND or QUERY...">
+            <button onclick="sendQuestion()" class="machined-button px-3 md:px-4 h-8 bg-primary text-text-main text-[10px] font-mono font-bold uppercase tracking-widest flex items-center gap-2">
+                <span class="material-symbols-outlined text-[14px]">send</span>
+                <span class="hidden sm:inline">Execute</span>
+            </button>
+        </div>
     </div>
 </div>
-{% endif %}
-
-{% if insights.recommendations %}
-<div class="insight-section">
-    <h2 style="margin-top: 0; color: var(--color-success);">Recommendations</h2>
-    <ul style="list-style: none; padding: 0; margin: 0;">
-    {% for recommendation in insights.recommendations %}
-        <li style="padding: var(--spacing-md) 0; padding-left: var(--spacing-2xl); position: relative; color: var(--color-text-secondary);">
-            <span style="position: absolute; left: 0; color: var(--color-success);">✓</span>
-            {{ recommendation }}
-        </li>
-    {% endfor %}
-    </ul>
-</div>
-{% endif %}
-
-<div class="chat-container">
-    <h3 style="margin-top: 0; margin-bottom: var(--spacing-lg);">Expense Assistant</h3>
-    <div id="chatBox" class="chat-box"></div>
-    <div class="chat-input-group">
-        <input type="text" id="chatInput" placeholder="Ask about your expenses...">
-        <button onclick="sendQuestion()" class="btn btn-primary">Send</button>
-    </div>
-</div>
-
-<a href="{{ url_for('index') }}" class="back-link">Back to Dashboard</a>
 
 <script>
     function sendQuestion() {
         const input = document.getElementById('chatInput');
         const question = input.value.trim();
         if (!question) return;
+        
         const box = document.getElementById('chatBox');
-        const userMsg = document.createElement('div');
-        userMsg.className = 'chat-message user';
-        userMsg.textContent = question;
-        box.appendChild(userMsg);
+        
+        // User Message
+        const userContainer = document.createElement('div');
+        userContainer.className = 'flex gap-3';
+        userContainer.innerHTML = `
+            <span class="text-accent-cyan font-bold">USER_OPS >></span>
+            <span class="text-text-main">${question}</span>
+        `;
+        box.appendChild(userContainer);
         input.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        // Bot Thinking
+        const thinking = document.createElement('div');
+        thinking.className = 'text-text-muted opacity-50 italic';
+        thinking.id = 'thinking-indicator';
+        thinking.textContent = '[PROCESSING...]';
+        box.appendChild(thinking);
         
         fetch('/chat', {
             method: 'POST',
@@ -94,17 +147,25 @@
         })
         .then(res=>res.json())
         .then(data=>{
-            const botMsg = document.createElement('div');
-            botMsg.className = 'chat-message bot';
-            botMsg.textContent = data.answer;
-            box.appendChild(botMsg);
+            document.getElementById('thinking-indicator').remove();
+            const botContainer = document.createElement('div');
+            botContainer.className = 'flex gap-3';
+            botContainer.innerHTML = `
+                <span class="text-primary font-bold">ASSISTANT_BOT >></span>
+                <span class="text-text-muted">${data.answer}</span>
+            `;
+            box.appendChild(botContainer);
             box.scrollTop = box.scrollHeight;
         })
         .catch(err=>{
-            const errMsg = document.createElement('div');
-            errMsg.className = 'chat-message bot';
-            errMsg.textContent = 'Error: Unable to process your question.';
-            box.appendChild(errMsg);
+            document.getElementById('thinking-indicator').remove();
+            const botContainer = document.createElement('div');
+            botContainer.className = 'flex gap-3 text-primary';
+            botContainer.innerHTML = `
+                <span class="font-bold">SYSTEM_ERROR >></span>
+                <span>CRITICAL FAIL IN NEURAL PROCESSING.</span>
+            `;
+            box.appendChild(botContainer);
         });
     }
 
