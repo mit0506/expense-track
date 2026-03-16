@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Machined Tactile - Dashboard</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#f2542c",
+          "background-light": "#f8f6f5",
+          "background-dark": "#111113",
+          "surface": "#1A1A1D",
+          "surface-alt": "#161619",
+          "surface-inset": "#0D0D0F",
+          "text-main": "#EBEBEB",
+          "text-muted": "#84848B",
+          "accent-cyan": "#00E5FF",
+        },
+        fontFamily: {
+          "display": ["Space Grotesk", "sans-serif"],
+          "mono": ["Space Mono", "monospace"],
+        },
+        boxShadow: {
+          "raised": "0 4px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)",
+          "pressed": "inset 0 2px 4px rgba(0,0,0,0.6)",
+          "input": "inset 0 2px 4px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05)",
+        },
+        borderRadius: {
+          "DEFAULT": "0.125rem",
+          "sm": "0.125rem",
+          "md": "0.25rem",
+          "lg": "0.25rem",
+          "xl": "0.25rem",
+          "full": "0.25rem"
+        },
+      },
+    },
+  }
+</script>
+<style>
+  body {
+    background-color: theme('colors.background-dark');
+    color: theme('colors.text-main');
+    font-family: theme('fontFamily.display');
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Machined Utilities */
+  .machined-plate {
+    background-color: theme('colors.surface');
+    border-top: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  }
+  
+  .machined-plate:hover {
+    border-top-color: theme('colors.accent-cyan');
+    transition: border-color 0s;
+  }
+
+  .machined-button {
+    box-shadow: theme('boxShadow.raised');
+    transition: all 0.1s ease;
+  }
+  
+  .machined-button:active {
+    box-shadow: theme('boxShadow.pressed');
+    transform: translateY(1px);
+  }
+  
+  .machined-input {
+    background-color: theme('colors.surface-inset');
+    box-shadow: theme('boxShadow.input');
+  }
+
+  .tactile-nav-item:hover {
+    background-color: rgba(255,255,255,0.03);
+    border-left: 2px solid theme('colors.accent-cyan');
+    padding-left: 0.625rem; /* 10px - 2px border */
+  }
+
+  .tactile-nav-item.active {
+    background-color: theme('colors.primary');
+    border-left: 2px solid theme('colors.primary');
+    box-shadow: theme('boxShadow.pressed');
+  }
+  
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Hide scrollbar for clean look */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: theme('colors.background-dark');
+  }
+  ::-webkit-scrollbar-thumb {
+    background: theme('colors.text-muted');
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.primary');
+  }
+</style>
+</head>
+<body class="h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
+<!-- Layout Container -->
+<div class="flex h-full w-full">
+<!-- Sidebar (240px) -->
+<aside class="w-[240px] h-full flex flex-col justify-between machined-plate border-r border-white/5 z-20 shrink-0">
+<div class="flex flex-col gap-8 p-6">
+<!-- Branding -->
+<div>
+<h1 class="text-text-main text-xs font-mono font-bold tracking-[0.05em] uppercase flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary block shadow-[0_0_8px_rgba(242,84,44,0.6)]"></span>
+            Machined Tactile
+          </h1>
+<p class="text-text-muted text-[10px] font-mono mt-1 tracking-wider uppercase">Sys_Tracker v1.0</p>
+</div>
+<!-- Navigation -->
+<nav class="flex flex-col gap-1">
+<a class="tactile-nav-item active flex items-center gap-3 px-3 py-2 rounded-sm text-text-main text-sm font-medium leading-normal transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">space_dashboard</span>
+            Dashboard
+          </a>
+<a class="tactile-nav-item flex items-center gap-3 px-3 py-2 rounded-sm text-text-muted hover:text-text-main text-sm font-medium leading-normal transition-all border-l-2 border-transparent" href="#">
+<span class="material-symbols-outlined text-[18px]">list_alt</span>
+            Ledger
+          </a>
+<a class="tactile-nav-item flex items-center gap-3 px-3 py-2 rounded-sm text-text-muted hover:text-text-main text-sm font-medium leading-normal transition-all border-l-2 border-transparent" href="#">
+<span class="material-symbols-outlined text-[18px]">monitoring</span>
+            Telemetry
+          </a>
+</nav>
+</div>
+<!-- Bottom Actions -->
+<div class="p-6 border-t border-white/5">
+<button class="machined-button w-full flex cursor-pointer items-center justify-center overflow-hidden rounded-sm h-12 px-4 bg-primary text-text-main text-xs font-mono font-bold tracking-[0.05em] uppercase">
+<span class="material-symbols-outlined mr-2 text-[18px]">add</span>
+          Add Expense
+        </button>
+</div>
+</aside>
+<!-- Main Content (1fr) -->
+<main class="flex-1 h-full flex flex-col overflow-y-auto overflow-x-hidden relative z-10">
+<!-- Top Bar / Header -->
+<header class="h-16 border-b border-white/5 flex items-center justify-between px-8 shrink-0 bg-background-dark/95 backdrop-blur sticky top-0 z-20">
+<div class="flex items-center gap-4">
+<h2 class="text-lg font-semibold tracking-tight">System Overview</h2>
+<span class="px-2 py-0.5 rounded-sm bg-surface-inset text-accent-cyan font-mono text-[10px] border border-white/5 uppercase tracking-wider">Live</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="machined-input h-8 px-3 rounded-sm flex items-center w-64 border border-white/5">
+<span class="material-symbols-outlined text-text-muted text-[16px] mr-2">search</span>
+<input class="bg-transparent border-none text-xs font-mono text-text-main placeholder-text-muted w-full focus:outline-none focus:ring-0 p-0" placeholder="SEARCH_LEDGER..." type="text"/>
+</div>
+<button class="w-8 h-8 flex items-center justify-center rounded-sm machined-plate hover:text-accent-cyan transition-colors text-text-muted">
+<span class="material-symbols-outlined text-[18px]">notifications</span>
+</button>
+</div>
+</header>
+<div class="p-8 flex flex-col gap-8 max-w-[1200px] mx-auto w-full">
+<!-- Metric Dials -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Balance -->
+<div class="machined-plate rounded-md p-6 relative group h-[120px] flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="text-text-muted font-mono text-[11px] tracking-[0.05em] uppercase">Total Balance</span>
+<span class="material-symbols-outlined text-text-muted text-[16px]">account_balance_wallet</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-text-muted font-mono text-sm">$</span>
+<span class="font-mono text-3xl font-bold tabular-nums tracking-tight">24,592.00</span>
+</div>
+<!-- LED Indicator -->
+<div class="absolute top-0 left-0 w-full h-[1px] bg-accent-cyan opacity-0 group-hover:opacity-100 transition-opacity duration-0"></div>
+</div>
+<!-- Cash In -->
+<div class="machined-plate rounded-md p-6 relative group h-[120px] flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="text-text-muted font-mono text-[11px] tracking-[0.05em] uppercase">Cash In (30D)</span>
+<span class="material-symbols-outlined text-text-muted text-[16px]">arrow_downward</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-accent-cyan font-mono text-sm">+$</span>
+<span class="font-mono text-3xl font-bold tabular-nums tracking-tight">8,240.50</span>
+</div>
+<div class="absolute top-0 left-0 w-full h-[1px] bg-accent-cyan opacity-0 group-hover:opacity-100 transition-opacity duration-0"></div>
+</div>
+<!-- Cash Out -->
+<div class="machined-plate rounded-md p-6 relative group h-[120px] flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="text-text-muted font-mono text-[11px] tracking-[0.05em] uppercase">Cash Out (30D)</span>
+<span class="material-symbols-outlined text-text-muted text-[16px]">arrow_upward</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-primary font-mono text-sm">-$</span>
+<span class="font-mono text-3xl font-bold tabular-nums tracking-tight">3,124.20</span>
+</div>
+<div class="absolute top-0 left-0 w-full h-[1px] bg-accent-cyan opacity-0 group-hover:opacity-100 transition-opacity duration-0"></div>
+</div>
+</section>
+<!-- Recent Activity Ledger -->
+<section class="flex flex-col gap-4">
+<div class="flex justify-between items-end border-b border-white/10 pb-2">
+<h3 class="text-sm font-semibold tracking-tight uppercase">Recent Activity</h3>
+<a class="text-[10px] font-mono text-text-muted hover:text-accent-cyan uppercase tracking-wider transition-colors" href="#">View Full Ledger -&gt;</a>
+</div>
+<div class="machined-plate rounded-md overflow-hidden">
+<!-- Header Row -->
+<div class="grid grid-cols-[100px_1fr_120px_100px] gap-4 px-4 py-2 bg-surface-inset border-b border-white/5">
+<div class="text-text-muted font-mono text-[10px] uppercase tracking-wider">Date</div>
+<div class="text-text-muted font-mono text-[10px] uppercase tracking-wider">Description</div>
+<div class="text-text-muted font-mono text-[10px] uppercase tracking-wider text-right">Amount</div>
+<div class="text-text-muted font-mono text-[10px] uppercase tracking-wider text-right">Status</div>
+</div>
+<!-- Data Rows (Striped) -->
+<div class="flex flex-col">
+<!-- Row 1 -->
+<div class="grid grid-cols-[100px_1fr_120px_100px] gap-4 px-4 h-10 items-center bg-surface border-b border-white/5 hover:bg-[#222226] cursor-pointer transition-colors group">
+<div class="font-mono text-xs text-text-muted tabular-nums">24-10-23</div>
+<div class="font-medium text-sm truncate">Acme Corp Hardware Setup</div>
+<div class="font-mono text-xs tabular-nums text-right text-text-main">- $1,240.00</div>
+<div class="flex justify-end items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-cyan shadow-[0_0_4px_#00E5FF]"></span>
+<span class="font-mono text-[10px] text-text-muted uppercase">Cleared</span>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-[100px_1fr_120px_100px] gap-4 px-4 h-10 items-center bg-surface-alt border-b border-white/5 hover:bg-[#222226] cursor-pointer transition-colors group">
+<div class="font-mono text-xs text-text-muted tabular-nums">24-10-22</div>
+<div class="font-medium text-sm truncate">AWS Cloud Services</div>
+<div class="font-mono text-xs tabular-nums text-right text-text-main">- $345.20</div>
+<div class="flex justify-end items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-cyan shadow-[0_0_4px_#00E5FF]"></span>
+<span class="font-mono text-[10px] text-text-muted uppercase">Cleared</span>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-[100px_1fr_120px_100px] gap-4 px-4 h-10 items-center bg-surface border-b border-white/5 hover:bg-[#222226] cursor-pointer transition-colors group">
+<div class="font-mono text-xs text-text-muted tabular-nums">24-10-21</div>
+<div class="font-medium text-sm truncate">Client Retainer - Q4</div>
+<div class="font-mono text-xs tabular-nums text-right text-accent-cyan">+ $5,000.00</div>
+<div class="flex justify-end items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_4px_#F2542D]"></span>
+<span class="font-mono text-[10px] text-text-muted uppercase">Pending</span>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="grid grid-cols-[100px_1fr_120px_100px] gap-4 px-4 h-10 items-center bg-surface-alt border-b border-white/5 hover:bg-[#222226] cursor-pointer transition-colors group">
+<div class="font-mono text-xs text-text-muted tabular-nums">24-10-20</div>
+<div class="font-medium text-sm truncate">Office Supplies - Uline</div>
+<div class="font-mono text-xs tabular-nums text-right text-text-main">- $89.00</div>
+<div class="flex justify-end items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-cyan shadow-[0_0_4px_#00E5FF]"></span>
+<span class="font-mono text-[10px] text-text-muted uppercase">Cleared</span>
+</div>
+</div>
+<!-- Row 5 -->
+<div class="grid grid-cols-[100px_1fr_120px_100px] gap-4 px-4 h-10 items-center bg-surface border-transparent hover:bg-[#222226] cursor-pointer transition-colors group">
+<div class="font-mono text-xs text-text-muted tabular-nums">24-10-18</div>
+<div class="font-medium text-sm truncate">Software Subscriptions (Oct)</div>
+<div class="font-mono text-xs tabular-nums text-right text-text-main">- $142.50</div>
+<div class="flex justify-end items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-cyan shadow-[0_0_4px_#00E5FF]"></span>
+<span class="font-mono text-[10px] text-text-muted uppercase">Cleared</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Context Panel (320px) -->
+<aside class="w-[320px] h-full machined-plate border-l border-white/5 z-20 shrink-0 hidden lg:flex flex-col">
+<div class="p-6 border-b border-white/5">
+<h3 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-muted mb-4">Module_Status</h3>
+<div class="space-y-4">
+<!-- Mini Stat 1 -->
+<div class="bg-surface-inset p-3 rounded-sm border border-white/5">
+<div class="flex justify-between items-center mb-1">
+<span class="font-mono text-[10px] text-text-muted uppercase">Burn Rate (Avg)</span>
+<span class="material-symbols-outlined text-[14px] text-text-muted">speed</span>
+</div>
+<div class="font-mono text-sm text-text-main tabular-nums">$104.10 / day</div>
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-surface mt-2 rounded-full overflow-hidden border border-white/5">
+<div class="h-full bg-primary w-[45%]"></div>
+</div>
+</div>
+<!-- Mini Stat 2 -->
+<div class="bg-surface-inset p-3 rounded-sm border border-white/5">
+<div class="flex justify-between items-center mb-1">
+<span class="font-mono text-[10px] text-text-muted uppercase">Budget Cap</span>
+<span class="material-symbols-outlined text-[14px] text-text-muted">data_usage</span>
+</div>
+<div class="font-mono text-sm text-text-main tabular-nums">68% Utilized</div>
+<!-- Progress Bar -->
+<div class="w-full h-1 bg-surface mt-2 rounded-full overflow-hidden border border-white/5">
+<div class="h-full bg-accent-cyan w-[68%]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<h3 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-muted mb-4">Quick_Actions</h3>
+<div class="grid grid-cols-2 gap-2">
+<button class="machined-plate h-16 rounded-sm flex flex-col items-center justify-center gap-1 hover:text-accent-cyan transition-colors group">
+<span class="material-symbols-outlined text-[20px] text-text-muted group-hover:text-accent-cyan">receipt_long</span>
+<span class="font-mono text-[9px] uppercase tracking-wide">Scan Recpt</span>
+</button>
+<button class="machined-plate h-16 rounded-sm flex flex-col items-center justify-center gap-1 hover:text-accent-cyan transition-colors group">
+<span class="material-symbols-outlined text-[20px] text-text-muted group-hover:text-accent-cyan">sync_alt</span>
+<span class="font-mono text-[9px] uppercase tracking-wide">Sync Bank</span>
+</button>
+<button class="machined-plate h-16 rounded-sm flex flex-col items-center justify-center gap-1 hover:text-accent-cyan transition-colors group">
+<span class="material-symbols-outlined text-[20px] text-text-muted group-hover:text-accent-cyan">file_download</span>
+<span class="font-mono text-[9px] uppercase tracking-wide">Export CSV</span>
+</button>
+<button class="machined-plate h-16 rounded-sm flex flex-col items-center justify-center gap-1 hover:text-accent-cyan transition-colors group">
+<span class="material-symbols-outlined text-[20px] text-text-muted group-hover:text-accent-cyan">settings</span>
+<span class="font-mono text-[9px] uppercase tracking-wide">Config</span>
+</button>
+</div>
+</div>
+</aside>
+</div>
+</body></html>

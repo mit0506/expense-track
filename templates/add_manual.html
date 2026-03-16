@@ -1,57 +1,99 @@
 {% extends "base.html" %}
 
-{% block title %}Add Expense - Expense Tracker{% endblock %}
+{% block title %}Add Expense - Machined Tactile{% endblock %}
+{% block header_title %}Entry Console{% endblock %}
 
 {% block content %}
-<div class="form-container">
-    <h1>Add Expense</h1>
-    
-    <form method="post">
-        <div class="form-group">
-            <label for="date" class="form-label">Date</label>
-            <input type="date" id="date" name="date" required class="form-input">
-        </div>
+<div class="max-w-[600px] mx-auto w-full">
+    <div class="machined-plate rounded-md overflow-hidden p-4 md:p-8 shadow-2xl relative">
+        <!-- LED Accent -->
+        <div class="absolute top-0 left-0 w-full h-[2px] bg-primary"></div>
+        
+        <header class="mb-8">
+            <h2 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-muted mb-1">Module // Manual_Entry</h2>
+            <p class="text-sm text-text-main font-medium">Initialize new transaction record</p>
+        </header>
 
-        <div class="form-group">
-            <label for="merchant" class="form-label">Merchant</label>
-            <input type="text" id="merchant" name="merchant" placeholder="e.g., Dominos, Uber, Amazon" required class="form-input">
-        </div>
+        <form method="POST" class="flex flex-col gap-6">
+            <!-- Amount Section (Massive Input) -->
+            <div class="flex flex-col gap-2">
+                <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Amount (INR)</label>
+                <div class="machined-inset h-20 rounded-sm flex items-center px-6 border border-white/5 relative group">
+                    <span class="text-primary font-mono text-2xl mr-4 group-focus-within:text-accent-cyan transition-colors">₹</span>
+                    <input type="number" step="0.01" name="amount" id="amount" required 
+                           class="bg-transparent border-none text-4xl font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0 tabular-nums" 
+                           placeholder="0.00">
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label for="amount" class="form-label">Amount</label>
-            <input type="number" id="amount" name="amount" step="0.01" placeholder="0.00" required class="form-input">
-        </div>
+            <!-- Grid for other fields -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Merchant -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Merchant / Recipient</label>
+                    <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
+                        <input type="text" name="merchant" required 
+                               class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0" 
+                               placeholder="ACME_CORP_...">
+                    </div>
+                </div>
 
-        <div class="form-group">
-            <label for="category" class="form-label">Category</label>
-            <select id="category" name="category" required class="form-select">
-                <option value="">Select a category</option>
-                <option value="Food">Food</option>
-                <option value="Transport">Transport</option>
-                <option value="Shopping">Shopping</option>
-                <option value="Entertainment">Entertainment</option>
-                <option value="Utilities">Utilities</option>
-                <option value="Health">Health</option>
-                <option value="Education">Education</option>
-                <option value="Miscellaneous">Miscellaneous</option>
-            </select>
-        </div>
+                <!-- Date -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Sequence Date</label>
+                    <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
+                        <input type="date" name="date" required 
+                               class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0 [color-scheme:dark]">
+                    </div>
+                </div>
 
-        <div class="form-group">
-            <label for="payment_type" class="form-label">Payment Type</label>
-            <select id="payment_type" name="payment_type" required class="form-select">
-                <option value="">Select payment type</option>
-                <option value="Cash">Cash</option>
-                <option value="Card">Card</option>
-                <option value="UPI">UPI</option>
-                <option value="Net Banking">Net Banking</option>
-            </select>
-        </div>
+                <!-- Category -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">System Node (Category)</label>
+                    <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5 cursor-pointer">
+                        <select name="category" required 
+                                class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0 appearance-none cursor-pointer">
+                            <option value="Food" class="bg-surface text-text-main">FOOD // CATERING</option>
+                            <option value="Transport" class="bg-surface text-text-main">TRANSIT // LOGISTICS</option>
+                            <option value="Shopping" class="bg-surface text-text-main">ASSETS // PROCUREMENT</option>
+                            <option value="Utilities" class="bg-surface text-text-main">UTILITIES // OPS</option>
+                            <option value="Entertainment" class="bg-surface text-text-main">ENT // RECREATION</option>
+                            <option value="Miscellaneous" class="bg-surface text-text-main" selected>MISC // UNCATEGORIZED</option>
+                        </select>
+                        <span class="material-symbols-outlined text-text-muted text-[18px]">keyboard_arrow_down</span>
+                    </div>
+                </div>
 
-        <div class="form-helper">
-            <button type="submit" class="btn btn-primary">Add Expense</button>
-            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
-        </div>
-    </form>
+                <!-- Payment Type -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Protocol (Payment)</label>
+                    <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5 cursor-pointer">
+                        <select name="payment_type" required 
+                                class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0 appearance-none cursor-pointer">
+                            <option value="Cash" class="bg-surface text-text-main">PHY // CASH</option>
+                            <option value="Card" class="bg-surface text-text-main">NET // CARD</option>
+                            <option value="UPI" class="bg-surface text-text-main" selected>VIRT // UPI</option>
+                            <option value="Net Banking" class="bg-surface text-text-main">NET // BANKING</option>
+                        </select>
+                        <span class="material-symbols-outlined text-text-muted text-[18px]">keyboard_arrow_down</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mt-4">
+                <button type="submit" class="machined-button w-full h-14 bg-primary text-text-main font-mono font-bold uppercase tracking-widest flex items-center justify-center gap-2 group hover:bg-primary/90 transition-colors">
+                    <span class="material-symbols-outlined group-active:translate-y-[1px]">save</span>
+                    Commit Transaction
+                </button>
+                <p class="text-[9px] font-mono text-text-muted text-center mt-3 uppercase tracking-tighter">Warning: All entries are final and recorded to the secure ledger.</p>
+            </div>
+        </form>
+    </div>
 </div>
+
+<script>
+    // Set default date to today
+    document.querySelector('input[type="date"]').valueAsDate = new Date();
+</script>
 {% endblock %}

@@ -1,22 +1,55 @@
 {% extends "base.html" %}
 
-{% block title %}Add Expense from SMS - Expense Tracker{% endblock %}
+{% block title %}SMS Parse - Machined Tactile{% endblock %}
+{% block header_title %}Input_Buffer // SMS_Parsing{% endblock %}
 
 {% block content %}
-<div class="form-container">
-    <h1>Add from SMS</h1>
-    <p style="text-align: center; color: var(--color-text-secondary); margin-bottom: var(--spacing-2xl);">Paste your transaction SMS and we'll extract the expense details automatically</p>
-    
-    <form method="post">
-        <div class="form-group">
-            <label for="sms_text" class="form-label">Transaction SMS</label>
-            <textarea id="sms_text" name="sms_text" rows="6" placeholder="Paste your SMS here...&#10;Example: Your UPI payment of Rs. 450 to Dominos Pizza on 12/03/2026 was successful" required class="form-textarea"></textarea>
-        </div>
+<div class="max-w-[600px] mx-auto w-full">
+    <div class="machined-plate rounded-md overflow-hidden p-4 md:p-8 shadow-2xl relative">
+        <!-- LED Accent -->
+        <div class="absolute top-0 left-0 w-full h-[2px] bg-accent-cyan"></div>
+        
+        <header class="mb-8">
+            <h2 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-muted mb-1">Module // Telemetry_Extraction</h2>
+            <p class="text-sm text-text-main font-medium">Extract transaction nodes from text buffers</p>
+        </header>
 
-        <div class="form-helper">
-            <button type="submit" class="btn btn-primary">Extract &amp; Add</button>
-            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
-        </div>
-    </form>
+        <form method="POST" class="flex flex-col gap-6">
+            <!-- SMS Text Area -->
+            <div class="flex flex-col gap-2">
+                <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Raw_Text_Buffer</label>
+                <div class="machined-inset p-4 rounded-sm border border-white/5 relative group">
+                    <textarea id="sms_text" name="sms_text" rows="8" required 
+                              class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0 placeholder:text-text-muted/20" 
+                              placeholder="PASTE_SMS_STRING_HERE...&#10;EXAMPLE: YOUR UPI PAYMENT OF RS. 450 TO DOMINOS WAS SUCCESSFUL..."></textarea>
+                    <!-- Pulse Indicator -->
+                    <div class="absolute bottom-2 right-2 w-1.5 h-1.5 rounded-full bg-accent-cyan/20 group-focus-within:bg-accent-cyan group-focus-within:shadow-[0_0_8px_#00E5FF] transition-all"></div>
+                </div>
+            </div>
+
+            <!-- Analysis Engine Settings (Visual Only) -->
+            <div class="bg-surface-inset p-4 rounded-sm border border-white/5 flex items-center justify-between">
+                <div class="flex flex-col gap-1">
+                    <span class="text-[9px] font-mono text-text-muted uppercase tracking-wide">Parsing_Engine</span>
+                    <span class="text-[10px] font-mono text-text-main uppercase">Regex_V2.0_Standard</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 rounded-full bg-accent-cyan shadow-[0_0_4px_#00E5FF]"></div>
+                    <span class="text-[9px] font-mono text-text-muted uppercase tracking-widest">Core_Online</span>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button type="submit" class="machined-button flex-1 h-14 bg-primary text-text-main font-mono font-bold uppercase tracking-widest flex items-center justify-center gap-2 group hover:bg-primary/90 transition-colors">
+                    <span class="material-symbols-outlined group-active:translate-y-[1px]">analytics</span>
+                    Execute_Parse
+                </button>
+                <a href="{{ url_for('index') }}" class="machined-plate flex items-center justify-center px-6 h-14 text-text-muted hover:text-text-main font-mono text-[10px] uppercase tracking-wider transition-colors">
+                    Abort
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
