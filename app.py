@@ -9,7 +9,7 @@ from datetime import datetime
 
 # optional AI chatbot integration
 try:
-    import openai
+    import openai  # type: ignore[import]
     # read API key from environment variable
     openai.api_key = os.environ.get('OPENAI_API_KEY', '')
 except ImportError:
@@ -18,9 +18,9 @@ except ImportError:
 # Try to set Tesseract path if it exists in common Windows locations
 try:
     if os.path.exists(r'C:\Program Files\Tesseract-OCR\tesseract.exe'):
-        pytesseract.pytesseract.pytesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+        setattr(pytesseract, 'pytesseract_cmd', r'C:\Program Files\Tesseract-OCR\tesseract.exe')
     elif os.path.exists(r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'):
-        pytesseract.pytesseract.pytesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'
+        setattr(pytesseract, 'pytesseract_cmd', r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe')
 except Exception:
     pass  # Tesseract will be auto-detected from PATH
 
@@ -47,6 +47,13 @@ class Expense(db.Model):
             'payment_type': self.payment_type
         }
 
+    def __init__(self, date: str = '', merchant: str = '', amount: float = 0.0, category: str = 'Miscellaneous', payment_type: str = 'Cash'):
+        self.date = date
+        self.merchant = merchant
+        self.amount = amount
+        self.category = category
+        self.payment_type = payment_type
+
 
 class UserProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -62,6 +69,12 @@ class UserProfile(db.Model):
             'monthly_target': self.monthly_target,
             'avatar': self.avatar
         }
+
+    def __init__(self, name: str = 'User', monthly_income: float = 0.0, monthly_target: float = 0.0, avatar: str | None = None):
+        self.name = name
+        self.monthly_income = monthly_income
+        self.monthly_target = monthly_target
+        self.avatar = avatar
 
 @app.route('/')
 def index():
@@ -120,7 +133,7 @@ def profile():
         file = request.files.get('avatar')
         if file and file.filename:
             filename = file.filename
-            avatar_dir = os.path.join(app.static_folder, 'avatars')
+            avatar_dir = os.path.join(str(app.static_folder), 'avatars')
             if not os.path.exists(avatar_dir):
                 os.makedirs(avatar_dir)
             filepath = os.path.join(avatar_dir, filename)
@@ -360,6 +373,8 @@ def get_custom_visualization():
     from datetime import datetime
     start = request.args.get('start')
     end = request.args.get('end')
+    if not start or not end:
+        return jsonify({'error': 'Missing start or end date'}), 400
     try:
         start_date = datetime.strptime(start, '%Y-%m-%d').date()
         end_date = datetime.strptime(end, '%Y-%m-%d').date()
