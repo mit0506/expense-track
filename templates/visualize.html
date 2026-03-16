@@ -143,81 +143,8 @@
 
     initCharts();
     toggleCharts();
-</script>
-{% endblock %}
-                    backgroundColor: '#667eea',
-                    borderColor: '#764ba2',
-                    borderWidth: 2,
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return '₹' + context.parsed.y.toFixed(2);
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    function loadData(period) {
-        fetch(`/api/visualization/${period}`)
-            .then(response => response.json())
-            .then(data => {
-                pieChart.data.labels = data.pie.labels;
-                pieChart.data.datasets[0].data = data.pie.data;
-                pieChart.update();
-
-                barChart.data.labels = data.bar.labels;
-                barChart.data.datasets[0].data = data.bar.data;
-                barChart.update();
-
-                document.getElementById('total-expenses').textContent = data.total_expenses;
-                document.getElementById('total-amount').textContent = data.total_amount.toFixed(2);
-            })
-            .catch(error => console.error('Error loading data:', error));
-    }
-
-    function loadCustom() {
-        const start = document.getElementById('startDate').value;
-        const end = document.getElementById('endDate').value;
-        if (!start || !end) {
-            alert('Please select both start and end dates');
-            return;
-        }
-        fetch(`/api/visualization/custom?start=${start}&end=${end}`)
-            .then(response => response.json())
-            .then(data => {
-                pieChart.data.labels = data.pie.labels;
-                pieChart.data.datasets[0].data = data.pie.data;
-                pieChart.update();
-
-                barChart.data.labels = data.bar.labels;
-                barChart.data.datasets[0].data = data.bar.data;
-                barChart.update();
-
-                document.getElementById('total-expenses').textContent = data.total_expenses;
-                document.getElementById('total-amount').textContent = data.total_amount.toFixed(2);
-            })
-            .catch(error => console.error('Error loading data:', error));
-    }
-
-    function toggleCharts() {
-        const type = document.getElementById('chartType').value;
-        document.getElementById('pieContainer').style.display = (type === 'bar') ? 'none' : 'block';
-        document.getElementById('barContainer').style.display = (type === 'pie') ? 'none' : 'block';
-    }
-
     document.addEventListener('DOMContentLoaded', function() {
+        // Ensure charts are initialized and monthly data is loaded after DOM ready
         initCharts();
         loadData('monthly');
     });
