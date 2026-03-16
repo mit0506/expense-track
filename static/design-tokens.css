@@ -1,0 +1,120 @@
+/* DESIGN TOKENS - Source of truth for all design decisions */
+
+:root {
+    /* COLOR PALETTE */
+    /* Primary: Blue-based professional palette */
+    --color-primary-900: #0f3a7d;
+    --color-primary-700: #1655b0;
+    --color-primary-600: #1f70d0;
+    --color-primary-500: #2b7de9;
+    --color-primary-400: #5b9ef5;
+    --color-primary-300: #a8c8f8;
+    --color-primary-100: #e8f1fd;
+    
+    /* Neutral: Grayscale */
+    --color-neutral-900: #0f1419;
+    --color-neutral-800: #1a1f2e;
+    --color-neutral-700: #2d333f;
+    --color-neutral-600: #4a5568;
+    --color-neutral-500: #676d7d;
+    --color-neutral-400: #9ca3af;
+    --color-neutral-300: #cbd2e0;
+    --color-neutral-200: #e2e8f0;
+    --color-neutral-100: #f5f7fa;
+    --color-neutral-50: #fafbfc;
+    
+    /* Semantic */
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+    --color-info: #3b82f6;
+    
+    /* Surface & Text */
+    --color-surface-bg: #ffffff;
+    --color-surface-subtle: #f5f7fa;
+    --color-text-primary: #0f1419;
+    --color-text-secondary: #676d7d;
+    --color-text-tertiary: #9ca3af;
+    --color-border: #e2e8f0;
+    
+    /* TYPOGRAPHY */
+    /* Font families */
+    --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
+    --font-family-mono: "Jetbrains Mono", "Courier New", monospace;
+    
+    /* Type scale (8px base, 1.25 ratio) */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.5rem;     /* 24px */
+    --font-size-2xl: 1.875rem;  /* 30px */
+    --font-size-3xl: 2.25rem;   /* 36px */
+    --font-size-4xl: 3rem;      /* 48px */
+    
+    /* Font weights */
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    
+    /* Line heights */
+    --line-height-tight: 1.2;
+    --line-height-snug: 1.375;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.625;
+    --line-height-loose: 2;
+    
+    /* Letter spacing */
+    --letter-spacing-tight: -0.01em;
+    --letter-spacing-normal: 0;
+    --letter-spacing-wide: 0.025em;
+    
+    /* SPACING SCALE (8px base, 1.5 ratio) */
+    --spacing-xs: 0.25rem;   /* 4px */
+    --spacing-sm: 0.5rem;    /* 8px */
+    --spacing-md: 0.75rem;   /* 12px */
+    --spacing-lg: 1rem;      /* 16px */
+    --spacing-xl: 1.5rem;    /* 24px */
+    --spacing-2xl: 2rem;     /* 32px */
+    --spacing-3xl: 3rem;     /* 48px */
+    --spacing-4xl: 4rem;     /* 64px */
+    
+    /* BORDER RADIUS - 2 max values per design principle */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    
+    /* SHADOWS - Limited set */
+    --shadow-xs: 0 1px 2px rgba(15, 20, 25, 0.05);
+    --shadow-sm: 0 1px 3px rgba(15, 20, 25, 0.1), 0 1px 2px rgba(15, 20, 25, 0.06);
+    --shadow-md: 0 4px 6px rgba(15, 20, 25, 0.1), 0 2px 4px rgba(15, 20, 25, 0.06);
+    --shadow-lg: 0 10px 15px rgba(15, 20, 25, 0.1), 0 4px 6px rgba(15, 20, 25, 0.05);
+    --shadow-xl: 0 20px 25px rgba(15, 20, 25, 0.1), 0 10px 10px rgba(15, 20, 25, 0.04);
+    
+    /* TRANSITIONS - Semantic purpose with cubic-bezier */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);       /* 0.15s */
+    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);       /* 0.2s */
+    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);       /* 0.3s */
+    
+    /* Z-INDEX SCALE */
+    --z-dropdown: 100;
+    --z-sticky: 50;
+    --z-fixed: 100;
+    --z-modal: 1000;
+    
+    /* BREAKPOINTS */
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+    
+    /* CONTAINER */
+    --container-width: 1200px;
+    --container-padding: var(--spacing-2xl);
+}
+
+/* Ensure consistent base properties */
+html {
+    scroll-behavior: smooth;
+}

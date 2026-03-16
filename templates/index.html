@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="header">
+        <h1>Your Expenses</h1>
+        <p class="header-subtitle">Review and manage your spending</p>
+    </div>
+
+    {% if target_exceeded %}
+    <div class="alert alert-warning">
+        <div class="alert-icon">!</div>
+        <div class="alert-content">
+            <h3>Monthly Target Exceeded</h3>
+            <p>Your current spending of <strong>₹{{ '%.2f'|format(monthly_total) }}</strong> exceeds your monthly target of <strong>₹{{ '%.2f'|format(user_profile.monthly_target) }}</strong>.</p>
+            <p>Consider reviewing your expenses to stay within budget.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="action-grid">
+        <a href="{{ url_for('add_manual') }}" class="action-card">
+            <div class="action-card-icon">+</div>
+            <div class="action-card-label">Add Manually</div>
+        </a>
+        <a href="{{ url_for('upload_receipt') }}" class="action-card">
+            <div class="action-card-icon">📷</div>
+            <div class="action-card-label">Scan Receipt</div>
+        </a>
+        <a href="{{ url_for('add_sms') }}" class="action-card">
+            <div class="action-card-icon">📱</div>
+            <div class="action-card-label">From SMS</div>
+        </a>
+        <a href="{{ url_for('visualize') }}" class="action-card">
+            <div class="action-card-icon">📊</div>
+            <div class="action-card-label">Analytics</div>
+        </a>
+        <a href="{{ url_for('insights') }}" class="action-card">
+            <div class="action-card-icon">💡</div>
+            <div class="action-card-label">Insights</div>
+        </a>
+        <a href="{{ url_for('api_expenses') }}" class="action-card">
+            <div class="action-card-icon">⬇</div>
+            <div class="action-card-label">Export Data</div>
+        </a>
+    </div>
+</div>
+
+<div class="expense-list">
+    <div class="expense-list-header">
+        <h2>Recent Expenses</h2>
+    </div>
+    {% if expenses %}
+        {% for expense in expenses %}
+        <div class="expense-item">
+            <div class="expense-details">
+                <div class="expense-merchant">{{ expense.merchant }}</div>
+                <div class="expense-meta">
+                    <span class="category-badge">{{ expense.category }}</span>
+                    <span>{{ expense.date }}</span>
+                    <span>{{ expense.payment_type }}</span>
+                </div>
+            </div>
+            <div class="expense-amount">₹{{ "%.2f"|format(expense.amount) }}</div>
+            <div class="expense-actions">
+                <form method="post" action="{{ url_for('delete_expense', expense_id=expense.id) }}">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this expense?')">Delete</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div style="text-align: center; color: var(--color-text-tertiary); padding: var(--spacing-3xl); font-size: var(--font-size-lg);">
+        <p style="margin: 0;">No expenses recorded yet.</p>
+        <p style="margin: var(--spacing-md) 0 0 0; font-size: var(--font-size-base);">Add your first expense to get started.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

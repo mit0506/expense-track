@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Expense Tracker{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom: var(--spacing-3xl);">
+    <h1>Expense Analytics</h1>
+    <p style="color: var(--color-text-secondary); font-size: var(--font-size-lg); margin: var(--spacing-lg) 0 0 0;">Review your spending patterns and trends</p>
+</div>
+
+<div class="chart-container">
+    <div class="chart-selector">
+        <label for="chartType"><strong>View Type:</strong></label>
+        <select id="chartType" onchange="toggleCharts()" class="chart-select">
+            <option value="both">Both Charts</option>
+            <option value="pie">Pie Chart</option>
+            <option value="bar">Bar Chart</option>
+        </select>
+    </div>
+
+    <div class="filter-buttons">
+        <h3 style="width: 100%; margin-bottom: var(--spacing-lg); margin-top: 0; color: var(--color-text-primary);">Time Period</h3>
+        <button onclick="loadData('daily')" class="filter-btn">Daily</button>
+        <button onclick="loadData('weekly')" class="filter-btn">Weekly</button>
+        <button onclick="loadData('monthly')" class="filter-btn">Monthly</button>
+        <button onclick="loadData('quarterly')" class="filter-btn">Quarterly</button>
+        <button onclick="loadData('semi-annually')" class="filter-btn">Semi-Annual</button>
+        <button onclick="loadData('annually')" class="filter-btn">Annual</button>
+    </div>
+
+    <div class="date-range" style="display: flex; gap: var(--spacing-lg); align-items: center; margin-bottom: var(--spacing-2xl); flex-wrap: wrap;">
+        <span style="font-weight: var(--font-weight-semibold);">Custom Date Range:</span>
+        <input type="date" id="startDate" style="padding: var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--radius-md);">
+        <span style="color: var(--color-text-tertiary);">to</span>
+        <input type="date" id="endDate" style="padding: var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--radius-md);">
+        <button onclick="loadCustom()" class="btn btn-primary">Apply</button>
+    </div>
+
+    <div style="background: var(--color-neutral-100); padding: var(--spacing-2xl); border-radius: var(--radius-lg); margin-bottom: var(--spacing-2xl);">
+        <h3 style="margin-top: 0; color: var(--color-primary-600);">Statistics</h3>
+        <p style="margin: var(--spacing-md) 0; font-size: var(--font-size-lg);"><span style="color: var(--color-text-tertiary);">Total Expenses:</span> <strong id="total-expenses">0</strong> transactions</p>
+        <p style="margin: 0; font-size: var(--font-size-lg);"><span style="color: var(--color-text-tertiary);">Total Amount:</span> <strong style="color: var(--color-primary-600);">₹<span id="total-amount">0</span></strong></p>
+    </div>
+</div>
+
+<div class="chart-container" id="pieContainer">
+    <h3 style="margin-top: 0;">Expenses by Category</h3>
+    <canvas id="pieChart"></canvas>
+</div>
+
+<div class="chart-container" id="barContainer">
+    <h3 style="margin-top: 0;">Expenses by Date</h3>
+    <canvas id="barChart"></canvas>
+</div>
+
+<a href="{{ url_for('index') }}" class="back-link">Back to Dashboard</a>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let pieChart, barChart;
+
+    function initCharts() {
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        const barCtx = document.getElementById('barChart').getContext('2d');
+
+        pieChart = new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        '#1f70d0', '#5b9ef5', '#2b7de9', '#1655b0',
+                        '#a8c8f8', '#5b9ef5', '#2b7de9', '#1655b0'
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ₹' + context.parsed + '.00';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Amount (₹)',
+                    data: [],
+                    backgroundColor: '#1f70d0',
+                    borderColor: '#1655b0',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return '₹' + value; }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function toggleCharts() {
+        const select = document.getElementById('chartType');
+        const pieContainer = document.getElementById('pieContainer');
+        const barContainer = document.getElementById('barContainer');
+        const value = select.value;
+        
+        pieContainer.style.display = (value === 'pie' || value === 'both') ? 'block' : 'none';
+        barContainer.style.display = (value === 'bar' || value === 'both') ? 'block' : 'none';
+    }
+
+    function loadData(period) {
+        // Implementation would go here
+        console.log('Loading data for period:', period);
+    }
+
+    function loadCustom() {
+        // Implementation would go here
+        console.log('Loading custom date range');
+    }
+
+    initCharts();
+    toggleCharts();
+</script>
+{% endblock %}
+                    backgroundColor: '#667eea',
+                    borderColor: '#764ba2',
+                    borderWidth: 2,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return '₹' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function loadData(period) {
+        fetch(`/api/visualization/${period}`)
+            .then(response => response.json())
+            .then(data => {
+                pieChart.data.labels = data.pie.labels;
+                pieChart.data.datasets[0].data = data.pie.data;
+                pieChart.update();
+
+                barChart.data.labels = data.bar.labels;
+                barChart.data.datasets[0].data = data.bar.data;
+                barChart.update();
+
+                document.getElementById('total-expenses').textContent = data.total_expenses;
+                document.getElementById('total-amount').textContent = data.total_amount.toFixed(2);
+            })
+            .catch(error => console.error('Error loading data:', error));
+    }
+
+    function loadCustom() {
+        const start = document.getElementById('startDate').value;
+        const end = document.getElementById('endDate').value;
+        if (!start || !end) {
+            alert('Please select both start and end dates');
+            return;
+        }
+        fetch(`/api/visualization/custom?start=${start}&end=${end}`)
+            .then(response => response.json())
+            .then(data => {
+                pieChart.data.labels = data.pie.labels;
+                pieChart.data.datasets[0].data = data.pie.data;
+                pieChart.update();
+
+                barChart.data.labels = data.bar.labels;
+                barChart.data.datasets[0].data = data.bar.data;
+                barChart.update();
+
+                document.getElementById('total-expenses').textContent = data.total_expenses;
+                document.getElementById('total-amount').textContent = data.total_amount.toFixed(2);
+            })
+            .catch(error => console.error('Error loading data:', error));
+    }
+
+    function toggleCharts() {
+        const type = document.getElementById('chartType').value;
+        document.getElementById('pieContainer').style.display = (type === 'bar') ? 'none' : 'block';
+        document.getElementById('barContainer').style.display = (type === 'pie') ? 'none' : 'block';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initCharts();
+        loadData('monthly');
+    });
+</script>
+{% endblock %}
