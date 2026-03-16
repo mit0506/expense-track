@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ledger - Machined Tactile Tracker</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#f2542c",
+          "background-light": "#f8f6f5",
+          "background-dark": "#221410",
+          // Derived neutral palette from primary hue
+          "surface-raised": "#331d17",
+          "surface-inset": "#150c0a",
+          "surface-border": "#44271f",
+          "text-main": "#f5ecea",
+          "text-muted": "#a38b85",
+          "accent-cyan": "#00E5FF",
+        },
+        fontFamily: {
+          "display": ["Space Grotesk", "sans-serif"]
+        },
+        borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+      },
+    },
+  }
+</script>
+<style type="text/tailwindcss">
+  @layer utilities {
+    .shadow-raised {
+      box-shadow: 0 4px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .shadow-pressed {
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    }
+    .shadow-input {
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05);
+    }
+    .shadow-panel {
+      box-shadow: -8px 0 24px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .text-tabular {
+      font-variant-numeric: tabular-nums;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+  }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main font-display h-screen w-screen overflow-hidden flex select-none">
+<!-- Main Content Area (Left) -->
+<main class="flex-1 flex flex-col min-w-0 bg-background-dark relative z-0">
+<!-- Control Bar (64px rigid height) -->
+<header class="h-[64px] min-h-[64px] flex items-center px-6 gap-4 border-b border-surface-border bg-background-dark shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] z-20">
+<!-- Debossed Search Input -->
+<label class="flex items-center w-[240px] h-[32px] bg-surface-inset rounded-[2px] shadow-input group border border-transparent focus-within:border-surface-border transition-colors duration-0">
+<span class="material-symbols-outlined text-text-muted ml-3 text-[16px]">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-[13px] text-text-main placeholder:text-text-muted/70 uppercase tracking-widest font-bold px-2 h-full text-tabular" placeholder="SEARCH_LEDGER..." type="text" value=""/>
+</label>
+<div class="h-[32px] w-[1px] bg-surface-border mx-2"></div>
+<!-- Tactical Dropdowns -->
+<div class="flex items-center gap-2">
+<button class="h-[32px] px-3 bg-surface-raised rounded-[2px] shadow-raised flex items-center gap-2 border border-transparent hover:border-surface-border hover:text-text-main text-text-muted text-[11px] uppercase tracking-widest font-bold transition-none active:shadow-pressed active:translate-y-[1px]">
+          DATE
+          <span class="material-symbols-outlined text-[14px]">arrow_drop_down</span>
+</button>
+<button class="h-[32px] px-3 bg-surface-raised rounded-[2px] shadow-raised flex items-center gap-2 border border-transparent hover:border-surface-border hover:text-text-main text-text-muted text-[11px] uppercase tracking-widest font-bold transition-none active:shadow-pressed active:translate-y-[1px]">
+          CATEGORY
+          <span class="material-symbols-outlined text-[14px]">arrow_drop_down</span>
+</button>
+<button class="h-[32px] px-3 bg-surface-raised rounded-[2px] shadow-raised flex items-center gap-2 border border-transparent hover:border-surface-border hover:text-text-main text-text-muted text-[11px] uppercase tracking-widest font-bold transition-none active:shadow-pressed active:translate-y-[1px]">
+          AMOUNT
+          <span class="material-symbols-outlined text-[14px]">arrow_drop_down</span>
+</button>
+</div>
+<div class="flex-1"></div>
+<!-- Action Button -->
+<button class="h-[32px] px-4 bg-primary rounded-[2px] shadow-raised flex items-center justify-center text-white text-[11px] uppercase tracking-widest font-bold hover:brightness-110 active:shadow-pressed active:translate-y-[1px] transition-none gap-2">
+<span class="material-symbols-outlined text-[14px]">add</span>
+        ENTRY
+      </button>
+</header>
+<!-- Data Table Container -->
+<div class="flex-1 flex flex-col min-h-0 bg-surface-inset">
+<!-- Table Header (24px height) -->
+<div class="h-[24px] min-h-[24px] bg-[#0A0605] border-b border-surface-border flex items-center px-6 text-[11px] text-text-muted uppercase tracking-[0.05em] font-bold shadow-[0_1px_0_rgba(255,255,255,0.02)] z-10 sticky top-0">
+<div class="w-[120px] flex-shrink-0">DATE</div>
+<div class="flex-1 min-w-[200px]">DESCRIPTION</div>
+<div class="w-[140px] flex-shrink-0">CATEGORY</div>
+<div class="w-[100px] flex-shrink-0">STATUS</div>
+<div class="w-[120px] flex-shrink-0 text-right">AMOUNT</div>
+</div>
+<!-- Table Body (Scrollable, 32px row height) -->
+<div class="flex-1 overflow-y-auto scrollbar-hide pb-20">
+<!-- Row 1 -->
+<div class="h-[32px] flex items-center px-6 border-b border-surface-border/40 text-[13px] text-tabular hover:bg-[#1C100D] cursor-pointer group transition-none">
+<div class="w-[120px] flex-shrink-0 text-text-muted">2023-10-24</div>
+<div class="flex-1 min-w-[200px] text-text-main truncate pr-4">Teenage Engineering OP-1 Field</div>
+<div class="w-[140px] flex-shrink-0 text-text-muted">EQUIPMENT</div>
+<div class="w-[100px] flex-shrink-0 flex items-center gap-2 text-[11px] font-bold tracking-widest text-text-main">
+<div class="size-[6px] rounded-full bg-accent-cyan shadow-[0_0_6px_rgba(0,229,255,0.6)]"></div>
+            CLR
+          </div>
+<div class="w-[120px] flex-shrink-0 text-right text-text-main font-bold">-1,999.00</div>
+</div>
+<!-- Row 2 (Selected State Mock) -->
+<div class="h-[32px] flex items-center px-6 border-b border-surface-border/40 text-[13px] text-tabular bg-surface-raised cursor-pointer relative">
+<!-- Active indicator -->
+<div class="absolute left-0 top-0 bottom-0 w-[2px] bg-primary"></div>
+<div class="w-[120px] flex-shrink-0 text-text-muted">2023-10-23</div>
+<div class="flex-1 min-w-[200px] text-text-main truncate pr-4">AWS Hosting Services</div>
+<div class="w-[140px] flex-shrink-0 text-text-muted">INFRA</div>
+<div class="w-[100px] flex-shrink-0 flex items-center gap-2 text-[11px] font-bold tracking-widest text-text-muted">
+<div class="size-[6px] rounded-full bg-primary shadow-[0_0_6px_rgba(242,84,44,0.6)]"></div>
+            PND
+          </div>
+<div class="w-[120px] flex-shrink-0 text-right text-text-main font-bold">-452.80</div>
+</div>
+<!-- Row 3 -->
+<div class="h-[32px] flex items-center px-6 border-b border-surface-border/40 text-[13px] text-tabular hover:bg-[#1C100D] cursor-pointer group transition-none">
+<div class="w-[120px] flex-shrink-0 text-text-muted">2023-10-21</div>
+<div class="flex-1 min-w-[200px] text-text-main truncate pr-4">Client Retainer: Acme Corp</div>
+<div class="w-[140px] flex-shrink-0 text-text-muted">INCOME</div>
+<div class="w-[100px] flex-shrink-0 flex items-center gap-2 text-[11px] font-bold tracking-widest text-text-main">
+<div class="size-[6px] rounded-full bg-accent-cyan shadow-[0_0_6px_rgba(0,229,255,0.6)]"></div>
+            CLR
+          </div>
+<div class="w-[120px] flex-shrink-0 text-right text-accent-cyan font-bold">+5,000.00</div>
+</div>
+<!-- Row 4 -->
+<div class="h-[32px] flex items-center px-6 border-b border-surface-border/40 text-[13px] text-tabular hover:bg-[#1C100D] cursor-pointer group transition-none">
+<div class="w-[120px] flex-shrink-0 text-text-muted">2023-10-20</div>
+<div class="flex-1 min-w-[200px] text-text-main truncate pr-4">Figma Enterprise License</div>
+<div class="w-[140px] flex-shrink-0 text-text-muted">SOFTWARE</div>
+<div class="w-[100px] flex-shrink-0 flex items-center gap-2 text-[11px] font-bold tracking-widest text-text-main">
+<div class="size-[6px] rounded-full bg-accent-cyan shadow-[0_0_6px_rgba(0,229,255,0.6)]"></div>
+            CLR
+          </div>
+<div class="w-[120px] flex-shrink-0 text-right text-text-main font-bold">-144.00</div>
+</div>
+<!-- Row 5 -->
+<div class="h-[32px] flex items-center px-6 border-b border-surface-border/40 text-[13px] text-tabular hover:bg-[#1C100D] cursor-pointer group transition-none">
+<div class="w-[120px] flex-shrink-0 text-text-muted">2023-10-18</div>
+<div class="flex-1 min-w-[200px] text-text-main truncate pr-4">Herman Miller Aeron Chair</div>
+<div class="w-[140px] flex-shrink-0 text-text-muted">OFFICE</div>
+<div class="w-[100px] flex-shrink-0 flex items-center gap-2 text-[11px] font-bold tracking-widest text-text-main">
+<div class="size-[6px] rounded-full bg-accent-cyan shadow-[0_0_6px_rgba(0,229,255,0.6)]"></div>
+            CLR
+          </div>
+<div class="w-[120px] flex-shrink-0 text-right text-text-main font-bold">-1,250.00</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Detail Pane (320px width, rendered as active/open) -->
+<aside class="w-[320px] bg-surface-raised border-l border-[#0A0605] shadow-panel z-30 flex flex-col relative">
+<!-- Pane Header -->
+<header class="h-[64px] min-h-[64px] flex items-center justify-between px-6 border-b border-surface-border shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+<div class="text-[11px] text-text-muted uppercase tracking-widest font-bold">TXN_ID: 8A9B2C</div>
+<button class="size-[24px] rounded-[2px] bg-surface-inset shadow-input flex items-center justify-center text-text-muted hover:text-text-main border border-transparent hover:border-surface-border transition-none">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</header>
+<!-- Pane Content -->
+<div class="flex-1 overflow-y-auto p-6 flex flex-col gap-8">
+<!-- Amount Display -->
+<div class="flex flex-col gap-2">
+<span class="text-[11px] text-text-muted uppercase tracking-widest font-bold">AMOUNT_USD</span>
+<div class="h-[64px] bg-surface-inset rounded-[2px] shadow-input border border-surface-border/50 flex items-center px-4">
+<span class="text-[32px] text-text-main font-bold text-tabular tracking-tight">-452.80</span>
+</div>
+</div>
+<!-- Detail Grid -->
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-1">
+<span class="text-[11px] text-text-muted uppercase tracking-widest font-bold">VENDOR</span>
+<div class="text-[14px] text-text-main bg-background-dark px-3 py-2 rounded-[2px] border border-surface-border shadow-input">
+            AWS Hosting Services
+          </div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-1">
+<span class="text-[11px] text-text-muted uppercase tracking-widest font-bold">DATE</span>
+<div class="text-[13px] text-text-main text-tabular bg-background-dark px-3 py-2 rounded-[2px] border border-surface-border shadow-input">
+              2023-10-23
+            </div>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[11px] text-text-muted uppercase tracking-widest font-bold">STATUS</span>
+<div class="h-full flex items-center gap-2 bg-background-dark px-3 py-2 rounded-[2px] border border-surface-border shadow-input">
+<div class="size-[6px] rounded-full bg-primary shadow-[0_0_6px_rgba(242,84,44,0.6)]"></div>
+<span class="text-[11px] font-bold tracking-widest text-text-main">PENDING</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[11px] text-text-muted uppercase tracking-widest font-bold">CATEGORY</span>
+<div class="text-[13px] text-text-main bg-background-dark px-3 py-2 rounded-[2px] border border-surface-border shadow-input flex justify-between items-center">
+            INFRASTRUCTURE
+            <span class="material-symbols-outlined text-[14px] text-text-muted">swap_horiz</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Pane Footer Actions -->
+<div class="p-6 border-t border-surface-border bg-surface-raised flex gap-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]">
+<button class="flex-1 h-[40px] bg-surface-inset rounded-[2px] shadow-input text-text-muted text-[11px] uppercase tracking-widest font-bold hover:text-text-main hover:border hover:border-surface-border transition-none flex items-center justify-center">
+        EDIT
+      </button>
+<button class="w-[40px] h-[40px] bg-[#2A1111] rounded-[2px] shadow-raised text-[#FF3366] text-[11px] font-bold border border-[#441717] hover:brightness-110 active:shadow-pressed active:translate-y-[1px] transition-none flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</aside>
+</body></html>

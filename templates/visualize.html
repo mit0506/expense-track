@@ -1,152 +1,245 @@
 {% extends "base.html" %}
 
-{% block title %}Analytics - Expense Tracker{% endblock %}
+{% block title %}Telemetry - Machined Tactile{% endblock %}
+{% block header_title %}Telemetry Distribution{% endblock %}
+
+{% block right_panel %}{% endblock %}
 
 {% block content %}
-<div style="text-align: center; margin-bottom: var(--spacing-3xl);">
-    <h1>Expense Analytics</h1>
-    <p style="color: var(--color-text-secondary); font-size: var(--font-size-lg); margin: var(--spacing-lg) 0 0 0;">Review your spending patterns and trends</p>
-</div>
-
-<div class="chart-container">
-    <div class="chart-selector">
-        <label for="chartType"><strong>View Type:</strong></label>
-        <select id="chartType" onchange="toggleCharts()" class="chart-select">
-            <option value="both">Both Charts</option>
-            <option value="pie">Pie Chart</option>
-            <option value="bar">Bar Chart</option>
-        </select>
-    </div>
-
-    <div class="filter-buttons">
-        <h3 style="width: 100%; margin-bottom: var(--spacing-lg); margin-top: 0; color: var(--color-text-primary);">Time Period</h3>
-        <button onclick="loadData('daily')" class="filter-btn">Daily</button>
-        <button onclick="loadData('weekly')" class="filter-btn">Weekly</button>
-        <button onclick="loadData('monthly')" class="filter-btn">Monthly</button>
-        <button onclick="loadData('quarterly')" class="filter-btn">Quarterly</button>
-        <button onclick="loadData('semi-annually')" class="filter-btn">Semi-Annual</button>
-        <button onclick="loadData('annually')" class="filter-btn">Annual</button>
-    </div>
-
-    <div class="date-range" style="display: flex; gap: var(--spacing-lg); align-items: center; margin-bottom: var(--spacing-2xl); flex-wrap: wrap;">
-        <span style="font-weight: var(--font-weight-semibold);">Custom Date Range:</span>
-        <input type="date" id="startDate" style="padding: var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--radius-md);">
-        <span style="color: var(--color-text-tertiary);">to</span>
-        <input type="date" id="endDate" style="padding: var(--spacing-md); border: 1px solid var(--color-border); border-radius: var(--radius-md);">
-        <button onclick="loadCustom()" class="btn btn-primary">Apply</button>
-    </div>
-
-    <div style="background: var(--color-neutral-100); padding: var(--spacing-2xl); border-radius: var(--radius-lg); margin-bottom: var(--spacing-2xl);">
-        <h3 style="margin-top: 0; color: var(--color-primary-600);">Statistics</h3>
-        <p style="margin: var(--spacing-md) 0; font-size: var(--font-size-lg);"><span style="color: var(--color-text-tertiary);">Total Expenses:</span> <strong id="total-expenses">0</strong> transactions</p>
-        <p style="margin: 0; font-size: var(--font-size-lg);"><span style="color: var(--color-text-tertiary);">Total Amount:</span> <strong style="color: var(--color-primary-600);">₹<span id="total-amount">0</span></strong></p>
-    </div>
-</div>
-
-<div class="chart-container" id="pieContainer">
-    <h3 style="margin-top: 0;">Expenses by Category</h3>
-    <canvas id="pieChart"></canvas>
-</div>
-
-<div class="chart-container" id="barContainer">
-    <h3 style="margin-top: 0;">Expenses by Date</h3>
-    <canvas id="barChart"></canvas>
-</div>
-
-<a href="{{ url_for('index') }}" class="back-link">Back to Dashboard</a>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    let pieChart, barChart;
-
-    function initCharts() {
-        const pieCtx = document.getElementById('pieChart').getContext('2d');
-        const barCtx = document.getElementById('barChart').getContext('2d');
-
-        pieChart = new Chart(pieCtx, {
-            type: 'doughnut',
-            data: {
-                labels: [],
-                datasets: [{
-                    data: [],
-                    backgroundColor: [
-                        '#1f70d0', '#5b9ef5', '#2b7de9', '#1655b0',
-                        '#a8c8f8', '#5b9ef5', '#2b7de9', '#1655b0'
-                    ],
-                    borderColor: '#ffffff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'bottom' },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.label + ': ₹' + context.parsed + '.00';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        barChart = new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Amount (₹)',
-                    data: [],
-                    backgroundColor: '#1f70d0',
-                    borderColor: '#1655b0',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) { return '₹' + value; }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    function toggleCharts() {
-        const select = document.getElementById('chartType');
-        const pieContainer = document.getElementById('pieContainer');
-        const barContainer = document.getElementById('barContainer');
-        const value = select.value;
+<div class="flex flex-col gap-6 w-full min-h-[calc(100vh-160px)]">
+    <!-- Header & Controls -->
+    <header class="flex flex-col md:flex-row justify-between items-end gap-4 pb-4 border-b border-white/5">
+        <div>
+            <h1 class="text-text-main tracking-tight text-xl font-semibold uppercase">Expense Distribution Analysis</h1>
+            <p class="text-text-muted font-mono text-[10px] mt-1 uppercase tracking-widest">System Analytics Module v2.1 // Source: SQLite_DB</p>
+        </div>
         
-        pieContainer.style.display = (value === 'pie' || value === 'both') ? 'block' : 'none';
-        barContainer.style.display = (value === 'bar' || value === 'both') ? 'block' : 'none';
+        <!-- Segmented Control -->
+        <div class="machined-inset flex h-auto md:h-10 flex-wrap md:flex-nowrap items-center p-1 rounded-sm w-full md:w-auto">
+            <button onclick="loadPeriodData('daily')" class="period-btn flex grow items-center justify-center rounded-sm px-2 py-2 md:py-0 text-text-muted text-[10px] font-mono font-bold uppercase transition-all" id="btn-daily">Daily</button>
+            <button onclick="loadPeriodData('weekly')" class="period-btn flex grow items-center justify-center rounded-sm px-2 py-2 md:py-0 text-text-muted text-[10px] font-mono font-bold uppercase transition-all" id="btn-weekly">Weekly</button>
+            <button onclick="loadPeriodData('monthly')" class="period-btn flex grow items-center justify-center rounded-sm px-2 py-2 md:py-0 bg-surface shadow-raised text-text-main text-[10px] font-mono font-bold uppercase transition-all" id="btn-monthly">Monthly</button>
+            <button onclick="loadPeriodData('annually')" class="period-btn flex grow items-center justify-center rounded-sm px-2 py-2 md:py-0 text-text-muted text-[10px] font-mono font-bold uppercase transition-all" id="btn-annually">Annual</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area: 50/50 Split -->
+    <div class="flex-1 flex flex-col gap-6 min-h-0">
+        <!-- Top Half: Master Bar Chart -->
+        <section class="min-h-[300px] lg:flex-1 machined-plate rounded-md p-4 lg:p-6 flex flex-col relative overflow-hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-text-muted font-mono text-[10px] uppercase tracking-widest font-bold">Aggregate Output Flow (Temporal)</h2>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-accent-cyan rounded-sm shadow-[0_0_4px_#00E5FF]"></span>
+                    <span class="text-accent-cyan font-mono text-[10px] uppercase hidden sm:inline">Synced</span>
+                </div>
+            </div>
+
+            <!-- Custom Bar Chart Container -->
+            <div id="bar-chart-container" class="flex-1 flex relative items-end pl-8 md:pl-12 pb-8 border-l border-b border-white/10 mt-4 overflow-x-auto min-h-[200px]">
+                <!-- Y-Axis (Dynamic) -->
+                <div id="y-axis" class="absolute left-0 top-0 bottom-8 w-6 md:w-10 flex flex-col justify-between text-right text-text-muted font-mono text-[8px] md:text-[9px] py-1">
+                    <span>MAX</span>
+                    <span>MID</span>
+                    <span>0</span>
+                </div>
+                
+                <!-- Horizontal Grid Lines -->
+                <div class="absolute inset-0 left-8 md:left-12 bottom-8 flex flex-col justify-between pointer-events-none opacity-[0.03]">
+                    <div class="border-b border-white w-full h-0"></div>
+                    <div class="border-b border-white w-full h-0"></div>
+                    <div class="border-b border-white w-full h-0"></div>
+                    <div class="border-b border-white w-full h-0"></div>
+                </div>
+
+                <!-- Bars Area (Injected via JS) -->
+                <div id="bars-wrapper" class="w-full h-full flex justify-between items-end px-2 md:px-4 gap-1 md:gap-2">
+                    <!-- Bars injected here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom Half: Category Breakdown -->
+        <section class="min-h-[400px] lg:flex-1 machined-plate rounded-md p-4 lg:p-6 flex flex-col">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <h2 class="text-text-muted font-mono text-[10px] uppercase tracking-widest font-bold">Node Allocation (Category)</h2>
+                <div class="flex items-center gap-4">
+                    <div class="flex flex-col items-end">
+                        <span class="text-[9px] font-mono text-text-muted uppercase">Total Volume</span>
+                        <span id="total-amount-display" class="text-sm font-mono text-text-main font-bold">₹0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Headers -->
+            <div class="grid grid-cols-6 sm:grid-cols-12 gap-2 sm:gap-4 px-4 py-2 bg-surface-inset border-y border-white/5 text-text-muted font-mono text-[9px] uppercase tracking-wider mb-2">
+                <div class="col-span-1 hidden sm:block">ID</div>
+                <div class="col-span-3 sm:col-span-4">Category Node</div>
+                <div class="col-span-1 hidden sm:block sm:col-span-5">Allocation Density</div>
+                <div class="col-span-3 sm:col-span-2 text-right">Value (INR)</div>
+            </div>
+
+            <!-- List Area -->
+            <div id="category-list" class="flex-1 overflow-y-auto pr-2 flex flex-col gap-1">
+                <!-- Rows injected here -->
+            </div>
+        </section>
+    </div>
+</div>
+
+<style>
+    .bar-chart-col {
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        border-radius: 2px 2px 0 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .bar-chart-col::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
     }
 
-    function loadData(period) {
-        // Implementation would go here
-        console.log('Loading data for period:', period);
+    .bar-chart-col:hover {
+        background-color: #f2542c !important;
+        box-shadow: 0 0 20px rgba(242, 84, 44, 0.3);
+        transform: scaleX(1.1);
+        z-index: 10;
     }
 
-    function loadCustom() {
-        // Implementation would go here
-        console.log('Loading custom date range');
+    .machined-inset {
+        background-color: #0D0D0F;
+        box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);
     }
 
-    initCharts();
-    toggleCharts();
-    document.addEventListener('DOMContentLoaded', function() {
-        // Ensure charts are initialized and monthly data is loaded after DOM ready
-        initCharts();
-        loadData('monthly');
-    });
+    #bar-chart-container {
+        background-image: 
+            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    .tooltip {
+        visibility: hidden;
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-8px);
+        z-index: 100;
+        opacity: 0;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        backdrop-filter: blur(12px);
+    }
+
+    .group:hover .tooltip {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(-50%) translateY(-12px);
+    }
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function loadPeriodData(period) {
+        // Update UI state
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.classList.remove('bg-surface', 'shadow-raised', 'text-text-main');
+            btn.classList.add('text-text-muted');
+        });
+        const activeBtn = document.getElementById(`btn-${period}`);
+        if(activeBtn) {
+            activeBtn.classList.add('bg-surface', 'shadow-raised', 'text-text-main');
+            activeBtn.classList.remove('text-text-muted');
+        }
+
+        try {
+            const response = await fetch(`/api/visualization/${period}`);
+            const data = await response.json();
+            renderCharts(data);
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    }
+
+    function renderCharts(data) {
+        // Update total display
+        document.getElementById('total-amount-display').textContent = `₹${data.total_amount.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+        // Render Bar Chart
+        const wrapper = document.getElementById('bars-wrapper');
+        wrapper.innerHTML = '';
+        
+        const labels = data.bar.labels;
+        const values = data.bar.data;
+        const maxVal = Math.max(...values, 1);
+
+        // Update Y-Axis
+        const yAxis = document.getElementById('y-axis');
+        yAxis.innerHTML = `
+            <span>₹${Math.round(maxVal).toLocaleString()}</span>
+            <span>₹${Math.round(maxVal/2).toLocaleString()}</span>
+            <span>0</span>
+        `;
+
+        labels.forEach((label, i) => {
+            const val = values[i];
+            const heightPercent = (val / maxVal) * 100;
+            const shortLabel = label.split('-').slice(1).join('/'); // MM/DD
+
+            const barContainer = document.createElement('div');
+            barContainer.className = 'relative w-full flex flex-col items-center justify-end h-full group';
+            barContainer.innerHTML = `
+                <div class="w-full bg-text-muted bar-chart-col relative rounded-t-sm" style="height: ${heightPercent}%">
+                    <div class="tooltip machined-plate px-3 py-2 rounded-sm border border-white/10 shadow-2xl">
+                        <span class="font-mono text-accent-cyan text-[10px] whitespace-nowrap">₹${val.toFixed(2)}</span>
+                    </div>
+                </div>
+                <span class="absolute -bottom-6 text-text-muted font-mono text-[8px] uppercase">${shortLabel}</span>
+            `;
+            wrapper.appendChild(barContainer);
+        });
+
+        // Render Category List
+        const list = document.getElementById('category-list');
+        list.innerHTML = '';
+        
+        const catLabels = data.pie.labels;
+        const catValues = data.pie.data;
+        const total = data.total_amount || 1;
+
+        catLabels.forEach((label, i) => {
+            const val = catValues[i];
+            const percent = (val / total) * 100;
+            const row = document.createElement('div');
+            const isEven = i % 2 === 0;
+            row.className = `grid grid-cols-6 sm:grid-cols-12 gap-2 sm:gap-4 px-4 py-3 ${isEven ? 'bg-surface' : 'bg-surface-alt'} hover:bg-[#222226] border-b border-white/5 items-center cursor-pointer group transition-colors`;
+            
+            row.innerHTML = `
+                <div class="col-span-1 hidden sm:block font-mono text-text-muted text-[10px]">${(i+1).toString().padStart(2, '0')}</div>
+                <div class="col-span-3 sm:col-span-4 font-mono text-xs text-text-main flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[16px] text-text-muted group-hover:text-primary transition-colors">hub</span>
+                    <span class="truncate">${label.toUpperCase()}</span>
+                </div>
+                <div class="col-span-1 hidden sm:flex sm:col-span-5 items-center gap-3">
+                    <div class="flex-1 h-2 machined-inset rounded-sm overflow-hidden">
+                        <div class="h-full bg-primary/40 group-hover:bg-primary transition-all rounded-sm shadow-[0_0_8px_rgba(242,84,45,0.2)]" style="width: ${percent}%"></div>
+                    </div>
+                    <span class="font-mono text-[10px] text-text-muted w-10 text-right">${percent.toFixed(0)}%</span>
+                </div>
+                <div class="col-span-3 sm:col-span-2 text-right font-mono text-xs text-text-main tabular-nums">${val.toFixed(2)}</div>
+            `;
+            list.appendChild(row);
+        });
+    }
+
+    // Initial Load
+    document.addEventListener('DOMContentLoaded', () => loadPeriodData('monthly'));
 </script>
 {% endblock %}

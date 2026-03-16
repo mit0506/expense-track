@@ -398,6 +398,50 @@ body {
     margin-bottom: 1rem;
 }
 
+/* Dark mode overrides */
+body.dark-mode {
+    background: #0f1724;
+    color: #e6eef8;
+}
+
+body.dark-mode .navbar {
+    background-color: rgba(20, 24, 31, 0.9);
+}
+
+body.dark-mode .navbar-menu a,
+body.dark-mode .profile-name {
+    color: #e6eef8;
+}
+
+body.dark-mode .form-container,
+body.dark-mode .expense-list,
+body.dark-mode .chart-container,
+body.dark-mode .dashboard {
+    background: #0b1220;
+    color: #dbeafe;
+    box-shadow: 0 6px 20px rgba(2,6,23,0.6);
+}
+
+body.dark-mode .form-group label,
+body.dark-mode .form-hint,
+body.dark-mode .expense-meta {
+    color: #cbd5e1;
+}
+
+body.dark-mode .btn-secondary {
+    background: #1f2937;
+    color: #e6eef8;
+}
+
+body.dark-mode .btn-primary {
+    filter: brightness(0.95);
+}
+
+body.dark-mode .expense-item:hover {
+    background-color: rgba(255,255,255,0.02);
+}
+
+
 .stats p {
     margin-bottom: 0.5rem;
     font-size: 1.1rem;
