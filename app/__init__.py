@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from .models import db, UserProfile
+from app.models import db, UserProfile
 from sqlalchemy import text
 import pytesseract
 
@@ -33,7 +33,7 @@ def create_app():
         pass
 
     # Register blueprints
-    from .routes import main_bp
+    from app.routes import main_bp
     app.register_blueprint(main_bp)
 
     # Database setup and migrations

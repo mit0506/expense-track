@@ -2,8 +2,8 @@ import os
 import re
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, current_app
-from .models import db, Expense, UserProfile
-from .utils import parse_sms, parse_receipt, generate_insights, parse_sms
+from app.models import db, Expense, UserProfile
+from app.utils import parse_sms, parse_receipt, generate_insights
 import pytesseract
 from PIL import Image
 from pytesseract import TesseractNotFoundError
