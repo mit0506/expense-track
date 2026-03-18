@@ -1,0 +1,32 @@
+{
+  "name": "expense-track",
+  "version": "1.0.0",
+  "description": "A modern, responsive Flask-based expense tracker featuring manual entry, receipt OCR, SMS parsing, and visual insights.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "tailwindcss -i ./app/static/css/src/input.css -o ./app/static/css/style.css --minify",
+    "watch": "tailwindcss -i ./app/static/css/src/input.css -o ./app/static/css/style.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mit0506/expense-track.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mit0506/expense-track/issues"
+  },
+  "homepage": "https://github.com/mit0506/expense-track#readme",
+  "devDependencies": {
+    "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/forms": "^0.5.11",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^3.4.19"
+  }
+}
