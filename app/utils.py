@@ -2,7 +2,7 @@ import re
 import os
 from datetime import datetime, timedelta
 from flask import current_app
-from .models import Expense, UserProfile
+from app.models import Expense, UserProfile
 
 def parse_sms(text):
     # Similar to parse_receipt but for SMS text
@@ -203,17 +203,19 @@ def generate_insights():
 
     # Warnings
     warnings: list[str] = []
-    monthly_income = float(current_app.config.get('MONTHLY_INCOME', 50000))
-    if total_spending > monthly_income * 0.8:
-        warnings.append(f"You've spent ₹{total_spending:.0f} which is {(total_spending/monthly_income)*100:.1f}% of your monthly income of ₹{monthly_income}.")
+    monthly_inc_lookup: float = float(current_app.config.get('MONTHLY_INCOME', 50000.0))
+    if float(total_spending) > (monthly_inc_lookup * 0.8):
+        overall_perc: float = (float(total_spending) / monthly_inc_lookup) * 100.0
+        warnings.append(f"You've spent ₹{total_spending:.0f} which is {overall_perc:.1f}% of your monthly income of ₹{monthly_inc_lookup}.")
 
     for category, amount in sorted_categories:
-        if amount > monthly_income * 0.3:  # More than 30% on one category
-            warnings.append(f"You're spending ₹{amount:.0f} on {category}, which is {(amount/monthly_income)*100:.1f}% of your income.")
+        if float(amount) > (monthly_inc_lookup * 0.3):  # More than 30% on one category
+            cat_perc: float = (float(amount) / monthly_inc_lookup) * 100.0
+            warnings.append(f"You're spending ₹{amount:.0f} on {category}, which is {cat_perc:.1f}% of your income.")
 
     # Recommendations
     recommendations: list[str] = []
-    high_spending_categories = [cat for cat, amt in sorted_categories if float(amt) > total_spending * 0.2]
+    high_spending_categories = [cat for cat, amt in sorted_categories if float(amt) > (float(total_spending) * 0.2)]
     for category in high_spending_categories:
         if category == 'Food':
             recommendations.append("Consider meal planning or cooking at home to reduce food expenses.")
