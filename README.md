@@ -39,7 +39,7 @@ A modern, responsive Flask-based expense tracker featuring manual entry, receipt
 
 4. **Initialize the Database**
    ```powershell
-   python init_db.py
+   python scripts/init_db.py
    ```
 
 5. **Configure VS Code (Recommended)**
@@ -48,17 +48,25 @@ A modern, responsive Flask-based expense tracker featuring manual entry, receipt
 
 6. **Run the Application**
    ```powershell
-   python app.py
+   python run.py
    ```
    Open `http://127.0.0.1:5000` in your browser.
 
 ## Project Structure
 
-- `app.py`: Main application logic and API endpoints.
-- `models.py`: Database schema for Expenses and User Profiles.
-- `templates/`: HTML templates with a responsive design.
-- `static/`: CSS, JavaScript, and user-uploaded avatars.
-- `uploads/`: Temporary storage for receipt images during processing.
+- `app/`: The core application package.
+    - `models.py`: Database schema.
+    - `routes.py`: Flask Blueprints and routes.
+    - `utils.py`: OCR, parsing, and analytics logic.
+    - `static/`: Frontend assets (CSS, JS, images).
+    - `templates/`: HTML templates.
+- `docs/`: Supplementary guides (e.g., Tesseract Installation).
+- `scripts/`: Initialization and maintenance scripts.
+- `run.py`: The entry point script to start the server.
+- `uploads/`: Storage for processed receipt images.
+
+## Documentation
+- [Tesseract OCR Installation Guide](docs/TESSERACT_INSTALLATION.md)
 
 ## License
 MIT
