@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-main: #f8f6f5;
+    --text-main: #1A1A1D;
+    --text-muted: #66666e;
+    --surface: #ffffff;
+    --surface-alt: #f0f0f2;
+    --surface-inset: #e2e2e5;
+    --border-color: rgba(0,0,0,0.1);
+    --accent: #f2542c;
+    --accent-secondary: #00b8d4;
+    --plate-bg: rgba(255, 255, 255, 0.8);
+    --glow: rgba(0, 0, 0, 0.05);
+  }
+
+  .dark {
+    --bg-main: #111113;
+    --text-main: #EBEBEB;
+    --text-muted: #84848B;
+    --surface: #1A1A1D;
+    --surface-alt: #161619;
+    --surface-inset: #0D0D0F;
+    --border-color: rgba(255,255,255,0.08);
+    --accent: #f2542c;
+    --accent-secondary: #00E5FF;
+    --plate-bg: rgba(26, 26, 29, 0.8);
+    --glow: rgba(0, 0, 0, 0.4);
+  }
+
+  body {
+    @apply transition-colors duration-300;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Space Grotesk', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(242, 84, 44, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 0% 0%, rgba(0, 229, 255, 0.02) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .machined-plate {
+    background-color: var(--plate-bg);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border-color);
+    border-right: 1px solid rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--glow);
+    border-left: 1px solid rgba(255,255,255,0.03);
+    box-shadow: 0 8px 32px var(--glow);
+    @apply transition-all duration-300;
+  }
+  
+  .machined-plate:hover {
+    border-top-color: var(--accent-secondary);
+    transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .machined-inset {
+    background-color: var(--surface-inset);
+    box-shadow: inset 0 2px 8px var(--glow), 0 1px 0 rgba(255,255,255,0.05);
+    @apply transition-colors duration-300;
+  }
+
+  .machined-button {
+    box-shadow: 0 4px 12px var(--glow), inset 0 1px 0 rgba(255,255,255,0.15);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .machined-button:active {
+    box-shadow: inset 0 4px 8px var(--glow);
+    @apply translate-y-[2px];
+  }
+
+  .machined-button:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 6px 16px rgba(242, 84, 44, 0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+
+  .tactile-nav-item {
+    @apply relative overflow-hidden;
+    color: var(--text-muted);
+  }
+
+  .tactile-nav-item:hover {
+    @apply bg-white/5;
+    color: var(--text-main) !important;
+  }
+
+  .tactile-nav-item::before {
+    content: '';
+    @apply absolute left-0 top-0 h-full w-[3px] scale-y-0 transition-transform duration-300;
+    background-color: var(--accent-secondary);
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .tactile-nav-item:hover::before {
+    @apply scale-y-100;
+  }
+
+  .tactile-nav-item.active {
+    background-color: rgba(242, 84, 44, 0.1);
+    color: var(--accent) !important;
+    box-shadow: inset 0 2px 10px var(--glow);
+  }
+
+  .tactile-nav-item.active::before {
+    background-color: var(--accent);
+    @apply scale-y-100 w-1;
+  }
+  
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .led-active {
+    animation: pulse-glow 2s infinite;
+  }
+
+  .theme-toggle-btn {
+    @apply h-10 w-10 flex items-center justify-center rounded-sm transition-all border border-white/10;
+    color: var(--text-muted);
+  }
+  
+  .theme-toggle-btn:hover {
+    @apply text-accent-cyan;
+  }
+}
+
+@layer utilities {
+  @keyframes pulse-glow {
+    0% { box-shadow: 0 0 5px rgba(242, 84, 44, 0.3); }
+    50% { box-shadow: 0 0 15px rgba(242, 84, 44, 0.6); }
+    100% { box-shadow: 0 0 5px rgba(242, 84, 44, 0.3); }
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--surface-inset);
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-[#3a3a3d] rounded-sm;
+    border: 2px solid var(--surface-inset);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
+}
