@@ -1,7 +1,17 @@
 <!DOCTYPE html>
-<html class="dark" lang="en">
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
+    <script>
+      (function() {
+        const theme = localStorage.getItem('theme') || 'dark';
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>{% block title %}Machined Tactile - Expense Tracker{% endblock %}</title>
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
@@ -15,15 +25,14 @@
         theme: {
           extend: {
             colors: {
-              "primary": "#f2542c",
-              "background-light": "#f8f6f5",
-              "background-dark": "#111113",
-              "surface": "#1A1A1D",
-              "surface-alt": "#161619",
-              "surface-inset": "#0D0D0F",
-              "text-main": "#EBEBEB",
-              "text-muted": "#84848B",
-              "accent-cyan": "#00E5FF",
+              "primary": "var(--accent)",
+              "background": "var(--bg-main)",
+              "surface": "var(--surface)",
+              "surface-alt": "var(--surface-alt)",
+              "surface-inset": "var(--surface-inset)",
+              "text-main": "var(--text-main)",
+              "text-muted": "var(--text-muted)",
+              "accent-cyan": "var(--accent-secondary)",
             },
             fontFamily: {
               "display": ["Space Grotesk", "sans-serif"],
@@ -47,9 +56,37 @@
       }
     </script>
     <style>
+      :root {
+        --bg-main: #f8f6f5;
+        --text-main: #1A1A1D;
+        --text-muted: #66666e;
+        --surface: #ffffff;
+        --surface-alt: #f0f0f2;
+        --surface-inset: #e2e2e5;
+        --border-color: rgba(0,0,0,0.1);
+        --accent: #f2542c;
+        --accent-secondary: #00b8d4;
+        --plate-bg: rgba(255, 255, 255, 0.8);
+        --glow: rgba(0, 0, 0, 0.05);
+      }
+
+      .dark {
+        --bg-main: #111113;
+        --text-main: #EBEBEB;
+        --text-muted: #84848B;
+        --surface: #1A1A1D;
+        --surface-alt: #161619;
+        --surface-inset: #0D0D0F;
+        --border-color: rgba(255,255,255,0.08);
+        --accent: #f2542c;
+        --accent-secondary: #00E5FF;
+        --plate-bg: rgba(26, 26, 29, 0.8);
+        --glow: rgba(0, 0, 0, 0.4);
+      }
+
       body {
-        background-color: #111113;
-        color: #EBEBEB;
+        background-color: var(--bg-main);
+        color: var(--text-main);
         font-family: 'Space Grotesk', sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
@@ -57,35 +94,38 @@
           radial-gradient(circle at 50% 50%, rgba(242, 84, 44, 0.03) 0%, transparent 50%),
           radial-gradient(circle at 0% 0%, rgba(0, 229, 255, 0.02) 0%, transparent 40%);
         background-attachment: fixed;
+        transition: background-color 0.3s ease, color 0.3s ease;
       }
       
       .machined-plate {
-        background-color: rgba(26, 26, 29, 0.8);
+        background-color: var(--plate-bg);
         backdrop-filter: blur(8px);
-        border-top: 1px solid rgba(255,255,255,0.08);
+        border-top: 1px solid var(--border-color);
         border-right: 1px solid rgba(255,255,255,0.03);
-        border-bottom: 1px solid rgba(0,0,0,0.5);
+        border-bottom: 1px solid var(--glow);
         border-left: 1px solid rgba(255,255,255,0.03);
-        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        box-shadow: 0 8px 32px var(--glow);
+        transition: all 0.3s ease;
       }
       
       .machined-plate:hover {
-        border-top-color: rgba(0, 229, 255, 0.4);
+        border-top-color: var(--accent-secondary);
         transition: border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       .machined-inset {
-        background-color: #0D0D0F;
-        box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);
+        background-color: var(--surface-inset);
+        box-shadow: inset 0 2px 8px var(--glow), 0 1px 0 rgba(255,255,255,0.05);
+        transition: background-color 0.3s ease;
       }
 
       .machined-button {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15);
+        box-shadow: 0 4px 12px var(--glow), inset 0 1px 0 rgba(255,255,255,0.15);
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       }
       
       .machined-button:active {
-        box-shadow: inset 0 4px 8px rgba(0,0,0,0.8);
+        box-shadow: inset 0 4px 8px var(--glow);
         transform: translateY(2px);
       }
 
@@ -97,11 +137,12 @@
       .tactile-nav-item {
         position: relative;
         overflow: hidden;
+        color: var(--text-muted);
       }
 
       .tactile-nav-item:hover {
         background-color: rgba(255,255,255,0.05);
-        color: #EBEBEB !important;
+        color: var(--text-main) !important;
       }
 
       .tactile-nav-item::before {
@@ -111,7 +152,7 @@
         top: 0;
         height: 100%;
         width: 3px;
-        background-color: #00E5FF;
+        background-color: var(--accent-secondary);
         transform: scaleY(0);
         transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       }
@@ -122,12 +163,12 @@
 
       .tactile-nav-item.active {
         background-color: rgba(242, 84, 44, 0.1);
-        color: #f2542c !important;
-        box-shadow: inset 0 2px 10px rgba(0,0,0,0.4);
+        color: var(--accent) !important;
+        box-shadow: inset 0 2px 10px var(--glow);
       }
 
       .tactile-nav-item.active::before {
-        background-color: #f2542c;
+        background-color: var(--accent);
         transform: scaleY(1);
         width: 4px;
       }
@@ -141,16 +182,15 @@
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #0D0D0F;
-        border-left: 1px solid rgba(255,255,255,0.03);
+        background: var(--surface-inset);
       }
       ::-webkit-scrollbar-thumb {
         background: #3a3a3d;
-        border: 2px solid #0D0D0F;
+        border: 2px solid var(--surface-inset);
         border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #f2542c;
+        background: var(--accent);
       }
 
       @keyframes pulse-glow {
@@ -161,6 +201,25 @@
 
       .led-active {
         animation: pulse-glow 2s infinite;
+      }
+
+      .theme-toggle-btn {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid var(--border-color);
+        background: var(--surface-inset);
+      }
+      
+      .theme-toggle-btn:hover {
+        background: var(--surface);
+        border-color: var(--accent-secondary);
+        color: var(--accent-secondary);
       }
     </style>
     {% block head %}{% endblock %}
@@ -219,7 +278,7 @@
         <!-- Main Content -->
         <main class="flex-1 h-full flex flex-col overflow-y-auto overflow-x-hidden relative z-10 w-full">
             <!-- Top Bar -->
-            <header class="h-16 border-b border-white/5 flex items-center justify-between px-4 lg:px-8 shrink-0 bg-background-dark/95 backdrop-blur sticky top-0 z-20">
+            <header class="h-16 border-b border-white/5 flex items-center justify-between px-4 lg:px-8 shrink-0 bg-background/95 backdrop-blur sticky top-0 z-20">
                 <div class="flex items-center gap-4">
                     <button onclick="toggleSidebar()" class="lg:hidden machined-plate p-2 rounded-sm text-text-muted hover:text-text-main">
                         <span class="material-symbols-outlined">menu</span>
@@ -228,6 +287,12 @@
                     <span class="hidden sm:inline-block px-2 py-0.5 rounded-sm bg-surface-inset text-accent-cyan font-mono text-[10px] border border-white/5 uppercase tracking-wider">Live</span>
                 </div>
                 <div class="flex items-center gap-3 lg:gap-6">
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="theme-toggle-btn h-10 w-10 flex items-center justify-center rounded-sm machined-plate border border-white/10 text-text-muted hover:text-accent-cyan transition-all" title="Toggle System Theme">
+                        <span class="material-symbols-outlined text-[18px] dark:hidden">dark_mode</span>
+                        <span class="material-symbols-outlined text-[18px] hidden dark:block">light_mode</span>
+                    </button>
+
                     <!-- Profile Info -->
                     <div class="flex items-center gap-2 lg:gap-3">
                         <div class="text-right flex flex-col hidden sm:flex">
@@ -266,6 +331,15 @@
                 overlay.classList.add('hidden');
                 document.body.style.overflow = '';
             }
+        }
+
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const isDarkNow = document.documentElement.classList.toggle('dark');
+                localStorage.setItem('theme', isDarkNow ? 'dark' : 'light');
+            });
         }
     </script>
 
