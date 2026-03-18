@@ -1,11 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 import pytesseract
 from pytesseract import TesseractNotFoundError
 from PIL import Image
 import re
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
+import calendar
 
 # optional AI chatbot integration
 try:
@@ -81,20 +83,18 @@ def index():
     expenses = Expense.query.all()
     # check monthly target
     profile = UserProfile.query.first()
-    target_exceeded = False
-    monthly_total = 0.0
-    if profile and profile.monthly_target and profile.monthly_target > 0:
-        today = datetime.today()
-        prefix = today.strftime('%Y-%m')  # e.g. '2026-03'
-        for exp in expenses:
-            if exp.date.startswith(prefix):
-                try:
-                    monthly_total += float(exp.amount)
-                except Exception:
-                    pass
-        if monthly_total > profile.monthly_target:
-            target_exceeded = True
-    return render_template('index.html', expenses=expenses, target_exceeded=target_exceeded, monthly_total=monthly_total)
+    target_exceeded: bool = False
+    today = datetime.today()
+    prefix = today.strftime('%Y-%m')  # e.g. '2026-03'
+    
+    total_monthly_spending: float = 0.0
+    for exp in expenses:
+        if exp and exp.date and exp.date.startswith(prefix):
+            total_monthly_spending = total_monthly_spending + float(exp.amount or 0.0)
+
+    if profile and profile.monthly_target and total_monthly_spending > float(profile.monthly_target):
+        target_exceeded = True
+    return render_template('index.html', expenses=expenses, target_exceeded=target_exceeded, monthly_total=total_monthly_spending)
 
 # make profile data and monthly total available globally
 @app.context_processor
@@ -106,20 +106,17 @@ def inject_global_data():
         db.session.commit()
     
     # Calculate monthly total once for all templates
-    monthly_total = 0.0
     expenses = Expense.query.all()
     today = datetime.today()
     prefix = today.strftime('%Y-%m')
+    total_spending_current_month: float = 0.0
     for exp in expenses:
-        if exp.date.startswith(prefix):
-            try:
-                monthly_total += float(exp.amount)
-            except (ValueError, TypeError):
-                pass
+        if exp and exp.date and exp.date.startswith(prefix):
+            total_spending_current_month = total_spending_current_month + float(exp.amount or 0.0)
                 
     return {
         'user_profile': profile,
-        'monthly_total': monthly_total
+        'monthly_total': total_spending_current_month
     }
 
 @app.route('/profile', methods=['GET', 'POST'])
@@ -194,10 +191,16 @@ def upload_receipt():
                 parsed = parse_receipt(text)
                 print(f"Parsed data: {parsed}")  # Debug: print parsed data
                 
-                if not parsed.get('merchant') or parsed.get('amount', 0) <= 0:
+                if not parsed.get('merchant') or float(parsed.get('amount', 0)) <= 0:
                     error = "Could not extract valid data from receipt. Please try another image or enter manually."
                 else:
-                    expense = Expense(**parsed)
+                    expense = Expense(
+                        date=str(parsed.get('date', '')),
+                        merchant=str(parsed.get('merchant', 'Unknown')),
+                        amount=float(parsed.get('amount', 0.0)),
+                        category=str(parsed.get('category', 'Miscellaneous')),
+                        payment_type=str(parsed.get('payment_type', 'Cash'))
+                    )
                     db.session.add(expense)
                     db.session.commit()
                     return redirect(url_for('index'))
@@ -214,7 +217,13 @@ def add_sms():
     if request.method == 'POST':
         sms_text = request.form['sms_text']
         parsed = parse_sms(sms_text)
-        expense = Expense(**parsed)
+        expense = Expense(
+            date=str(parsed.get('date', '')),
+            merchant=str(parsed.get('merchant', 'Unknown')),
+            amount=float(parsed.get('amount', 0.0)),
+            category=str(parsed.get('category', 'Miscellaneous')),
+            payment_type=str(parsed.get('payment_type', 'Cash'))
+        )
         db.session.add(expense)
         db.session.commit()
         return redirect(url_for('index'))
@@ -340,9 +349,6 @@ def filter_by_date_range(expense_data, start_date, end_date):
 
 @app.route('/api/visualization/<period>')
 def get_visualization_data(period):
-    from datetime import datetime, timedelta
-    import calendar
-
     # Get all expenses
     expenses = Expense.query.all()
 
@@ -391,11 +397,11 @@ def get_visualization_data(period):
                     filtered_data.append(expense)
 
     # Group by category for pie chart
-    category_totals = {}
+    category_totals: dict[str, float] = {}
     for expense in filtered_data:
-        category = expense['category']
-        amount = expense['amount']
-        category_totals[category] = category_totals.get(category, 0) + amount
+        cat = str(expense.get('category', 'Miscellaneous'))
+        amt = float(expense.get('amount', 0.0))
+        category_totals[cat] = category_totals.get(cat, 0.0) + amt
 
     # Prepare data for charts
     pie_data = {
@@ -404,11 +410,11 @@ def get_visualization_data(period):
     }
 
     # For bar chart, group by date
-    date_totals = {}
+    date_totals: dict[str, float] = {}
     for expense in filtered_data:
-        date = expense['date']
-        amount = expense['amount']
-        date_totals[date] = date_totals.get(date, 0) + amount
+        date_key = str(expense.get('date', ''))
+        amount_val = float(expense.get('amount', 0.0))
+        date_totals[date_key] = date_totals.get(date_key, 0.0) + amount_val
 
     # sort by date for ascending order
     sorted_dates = sorted(date_totals.keys())
@@ -442,12 +448,14 @@ def get_custom_visualization():
     filtered = filter_by_date_range(expense_data, start_date, end_date)
 
     # compute totals
-    category_totals = {}
-    date_totals = {}
+    category_totals: dict[str, float] = {}
+    date_totals: dict[str, float] = {}
     for exp in filtered:
-        cat = exp['category']; amt = exp['amount']
-        category_totals[cat] = category_totals.get(cat,0)+amt
-        date_totals[exp['date']] = date_totals.get(exp['date'],0)+amt
+        cat = str(exp.get('category', 'Miscellaneous'))
+        amt = float(exp.get('amount', 0.0))
+        category_totals[cat] = category_totals.get(cat, 0.0) + amt
+        date_key = str(exp.get('date', ''))
+        date_totals[date_key] = date_totals.get(date_key, 0.0) + amt
 
     pie = {'labels': list(category_totals.keys()), 'data': list(category_totals.values())}
     # sort dates for bar
@@ -462,9 +470,6 @@ def get_custom_visualization():
     })
 
 def generate_insights():
-    from datetime import datetime, timedelta
-    from collections import defaultdict
-
     # Get all expenses
     expenses = Expense.query.all()
     expense_data = [e.to_dict() for e in expenses]
@@ -479,15 +484,19 @@ def generate_insights():
         }
 
     # Calculate total spending
-    total_spending = sum(e['amount'] for e in expense_data)
+    total_spending: float = 0.0
+    for e in expense_data:
+        total_spending = total_spending + float(e.get('amount', 0.0))
 
     # Category breakdown
-    category_totals = defaultdict(float)
+    category_totals: dict[str, float] = {}
     for e in expense_data:
-        category_totals[e['category']] += e['amount']
+        cat_key = str(e.get('category', 'Miscellaneous'))
+        amt_val = float(e.get('amount', 0.0))
+        category_totals[cat_key] = category_totals.get(cat_key, 0.0) + amt_val
 
     # Sort categories by spending
-    sorted_categories = sorted(category_totals.items(), key=lambda x: x[1], reverse=True)
+    sorted_categories: list[tuple[str, float]] = sorted(category_totals.items(), key=lambda x: x[1], reverse=True)
 
     # Trends analysis (compare this week vs last week, this month vs last month)
     now = datetime.now()
@@ -499,13 +508,13 @@ def generate_insights():
     last_month_start = (this_month_start - timedelta(days=1)).replace(day=1)
     last_month_end = this_month_start - timedelta(days=1)
 
-    this_week_spending = defaultdict(float)
-    last_week_spending = defaultdict(float)
-    this_month_spending = defaultdict(float)
-    last_month_spending = defaultdict(float)
+    this_week_spending: dict[str, float] = {}
+    last_week_spending: dict[str, float] = {}
+    this_month_spending: dict[str, float] = {}
+    last_month_spending: dict[str, float] = {}
 
     for e in expense_data:
-        date_str = e.get('date') if isinstance(e, dict) else getattr(e, 'date', '')
+        date_str = str(e.get('date', ''))
         if not date_str:
             continue
         try:
@@ -513,45 +522,49 @@ def generate_insights():
         except (ValueError, TypeError):
             continue
 
+        amt = float(e.get('amount', 0.0))
+        cat = str(e.get('category', 'Miscellaneous'))
         if expense_date >= this_week_start:
-            this_week_spending[e['category']] += e['amount']
+            this_week_spending[cat] = this_week_spending.get(cat, 0.0) + amt
         elif last_week_start <= expense_date <= last_week_end:
-            last_week_spending[e['category']] += e['amount']
+            last_week_spending[cat] = last_week_spending.get(cat, 0.0) + amt
 
         if expense_date >= this_month_start:
-            this_month_spending[e['category']] += e['amount']
+            this_month_spending[cat] = this_month_spending.get(cat, 0.0) + amt
         elif last_month_start <= expense_date <= last_month_end:
-            last_month_spending[e['category']] += e['amount']
+            last_month_spending[cat] = last_month_spending.get(cat, 0.0) + amt
 
     # Calculate trends
-    trends = []
-    for category in set(list(this_week_spending.keys()) + list(last_week_spending.keys())):
-        this_week = this_week_spending.get(category, 0)
-        last_week = last_week_spending.get(category, 0)
-        if last_week > 0:
+    trends: list[str] = []
+    all_categories = set(list(this_week_spending.keys()) + list(last_week_spending.keys()))
+    for category in all_categories:
+        this_week = float(this_week_spending.get(category, 0.0))
+        last_week = float(last_week_spending.get(category, 0.0))
+        if last_week > 0.0:
             change = ((this_week - last_week) / last_week) * 100
             trends.append(f"{category} spending {'increased' if change > 0 else 'decreased'} by {abs(change):.1f}% this week.")
 
-    for category in set(list(this_month_spending.keys()) + list(last_month_spending.keys())):
-        this_month = this_month_spending.get(category, 0)
-        last_month = last_month_spending.get(category, 0)
-        if last_month > 0:
+    month_categories = set(list(this_month_spending.keys()) + list(last_month_spending.keys()))
+    for category in month_categories:
+        this_month = float(this_month_spending.get(category, 0.0))
+        last_month = float(last_month_spending.get(category, 0.0))
+        if last_month > 0.0:
             change = ((this_month - last_month) / last_month) * 100
             trends.append(f"{category} spending {'increased' if change > 0 else 'decreased'} by {abs(change):.1f}% this month.")
 
     # Warnings
-    warnings = []
-    monthly_income = app.config['MONTHLY_INCOME']
+    warnings: list[str] = []
+    monthly_income = float(app.config.get('MONTHLY_INCOME', 50000))
     if total_spending > monthly_income * 0.8:
-        warnings.append(f"You've spent {total_spending:.0f} which is {(total_spending/monthly_income)*100:.1f}% of your monthly income of {monthly_income}.")
+        warnings.append(f"You've spent ₹{total_spending:.0f} which is {(total_spending/monthly_income)*100:.1f}% of your monthly income of ₹{monthly_income}.")
 
     for category, amount in sorted_categories:
         if amount > monthly_income * 0.3:  # More than 30% on one category
-            warnings.append(f"You're spending {amount:.0f} on {category}, which is {(amount/monthly_income)*100:.1f}% of your income.")
+            warnings.append(f"You're spending ₹{amount:.0f} on {category}, which is {(amount/monthly_income)*100:.1f}% of your income.")
 
     # Recommendations
-    recommendations = []
-    high_spending_categories = [cat for cat, amt in sorted_categories if amt > total_spending * 0.2]
+    recommendations: list[str] = []
+    high_spending_categories = [cat for cat, amt in sorted_categories if float(amt) > total_spending * 0.2]
     for category in high_spending_categories:
         if category == 'Food':
             recommendations.append("Consider meal planning or cooking at home to reduce food expenses.")
@@ -562,9 +575,16 @@ def generate_insights():
         else:
             recommendations.append(f"Review your {category.lower()} expenses and look for cost-saving alternatives.")
 
-    # Savings potential
-    potential_savings = sum(amt * 0.1 for cat, amt in sorted_categories[:2])  # 10% reduction on top 2 categories
-    if potential_savings > 0:
+    # savings potential (manual loop for first 2 to satisfy IDE)
+    potential_savings: float = 0.0
+    count: int = 0
+    for cat, amt in sorted_categories:
+        if count >= 2:
+            break
+        potential_savings = potential_savings + (float(amt) * 0.1)
+        count = count + 1
+
+    if potential_savings > 0.0:
         recommendations.append(f"Reducing spending by 10% on your top categories could save you ₹{potential_savings:.0f} monthly.")
 
     return {
@@ -692,8 +712,6 @@ def parse_receipt(text):
     }
     print(f"Parsed result: {result}")  # Debug print
     return result
-
-from sqlalchemy import text
 
 def ensure_profile_columns():
     # add needed columns if missing
