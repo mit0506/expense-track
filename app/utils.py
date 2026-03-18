@@ -17,7 +17,7 @@ def parse_sms(text):
             date = date_match.group(1).replace('/', '-')
 
     if not date:
-        date = datetime.today().strftime('%Y-%m-%d')  # Default to today
+        date = datetime.today().strftime('%Y-%m-%d')
 
     # Merchant: look for common patterns in SMS like "from" or "at"
     merchant = 'Unknown'
