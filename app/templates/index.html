@@ -98,7 +98,7 @@
             <h3 class="text-xs font-mono font-bold tracking-[0.1em] uppercase text-text-muted">Transaction_Ledger</h3>
             <p class="text-[9px] font-mono text-text-muted/50 uppercase mt-0.5">Real-time data stream // Entry_Count: {{ expenses|length }}</p>
         </div>
-        <a class="text-[10px] font-mono text-text-muted hover:text-accent-cyan uppercase tracking-wider transition-colors flex items-center gap-2 group" href="{{ url_for('visualize') }}">
+        <a class="text-[10px] font-mono text-text-muted hover:text-accent-cyan uppercase tracking-wider transition-colors flex items-center gap-2 group" href="{{ url_for('main.visualize') }}">
             <span class="hidden sm:inline">Detailed_Analysis</span>
             <span class="sm:hidden">Telemetry</span> 
             <span class="material-symbols-outlined text-[14px] group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
@@ -162,7 +162,7 @@
 
                         <!-- Actions -->
                         <div class="flex justify-end gap-2">
-                            <form method="post" action="{{ url_for('delete_expense', expense_id=expense.id) }}" class="flex">
+                            <form method="post" action="{{ url_for('main.delete_expense', expense_id=expense.id) }}" class="flex">
                                 <button type="submit" class="w-8 h-8 rounded-sm machined-plate flex items-center justify-center text-text-muted hover:text-primary hover:border-primary/50 transition-all active:scale-95" 
                                         onclick="return confirm('Confirm deletion of entry?')">
                                     <span class="material-symbols-outlined text-[16px]">delete</span>
@@ -184,7 +184,7 @@
                         <p class="font-mono text-[10px] text-text-muted uppercase tracking-[0.2em]">NO_RECORDS_INDEXED</p>
                         <p class="text-[9px] font-mono text-text-muted/50 uppercase mt-1">Database stream is empty. Initialization required.</p>
                     </div>
-                    <a href="{{ url_for('add_manual') }}" class="machined-button px-6 py-2 bg-primary text-text-main text-[10px] font-mono font-bold uppercase tracking-widest mt-2">
+                    <a href="{{ url_for('main.add_manual') }}" class="machined-button px-6 py-2 bg-primary text-text-main text-[10px] font-mono font-bold uppercase tracking-widest mt-2">
                         Initialize First Entry
                     </a>
                 </div>
