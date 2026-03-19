@@ -95,6 +95,7 @@ content %}
   .health-over {
     background-color: #f2542c;
   }
+
   .health-under {
     background-color: #00e5ff;
   }
@@ -167,7 +168,7 @@ content %}
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
     {% for cat, limit in cat_budgets.items() %} {% set spent =
     cat_spending.get(cat, 0.0) %} {% set pct = (spent / limit * 100) if limit >
-    0 else 0 %}
+    0 else 0 %} {% set clamped_pct = pct if pct <= 100 else 100 %}
     <div
       class="machined-plate p-4 rounded-sm border border-white/5 flex flex-col gap-2">
       <div class="flex justify-between items-center mb-1">
@@ -184,9 +185,8 @@ content %}
         ₹{{ "%.0f"|format(spent) }} / ₹{{ "%.0f"|format(limit) }}
       </div>
       <div class="w-full h-[3px] bg-surface mt-1 rounded-full overflow-hidden">
-        <div
-          class="h-full {% if spent > limit %}bg-primary{% else %}bg-accent-cyan{% endif %}"
-          style="width: {{ pct if pct <= 100 else 100 }}%;"></div>
+        {% set bar_color = 'bg-primary' if spent > limit else 'bg-accent-cyan' %}
+        <div class="h-full {{ bar_color }}" style="width: calc({{ clamped_pct }} * 1%);"></div>
       </div>
     </div>
     {% endfor %}
@@ -315,6 +315,14 @@ content %}
 
           <!-- Actions -->
           <div class="flex justify-end gap-2">
+            <a
+              href="{{ url_for('main.split_expense', expense_id=expense.id) }}"
+              class="w-8 h-8 rounded-sm machined-plate flex items-center justify-center text-text-muted hover:text-white hover:border-white transition-all active:scale-95"
+              title="Split Bill">
+              <span class="material-symbols-outlined text-[16px]"
+                >call_split</span
+              >
+            </a>
             <a
               href="{{ url_for('main.edit_expense', expense_id=expense.id) }}"
               class="w-8 h-8 rounded-sm machined-plate flex items-center justify-center text-text-muted hover:text-accent-cyan hover:border-accent-cyan/50 transition-all active:scale-95">
