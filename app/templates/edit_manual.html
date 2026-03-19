@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Edit Expense{% endblock %}
+{% block header_title %}Edit Entry{% endblock %}
+{% block content %}
+<div class="max-w-[700px] mx-auto w-full">
+    <div class="machined-plate rounded-md overflow-hidden p-8 shadow-2xl relative">
+        <form method="POST" action="{{ url_for('main.edit_expense', expense_id=expense.id) }}" class="flex flex-col gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                <!-- Date -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Transaction_Date</label>
+                    <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
+                        <input type="date" name="date" value="{{ expense.date }}" required class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none">
+                    </div>
+                </div>
+                <!-- Merchant -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Entity_Merchant</label>
+                    <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
+                        <input type="text" name="merchant" value="{{ expense.merchant }}" required class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none">
+                    </div>
+                </div>
+                <!-- Amount -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Volume_INR</label>
+                    <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
+                        <span class="text-text-muted font-mono text-xs mr-2">₹</span>
+                        <input type="number" step="0.01" name="amount" value="{{ expense.amount }}" required class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none tabular-nums">
+                    </div>
+                </div>
+                <!-- Category -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Classification_Node</label>
+                    <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5 relative">
+                        <select name="category" class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none appearance-none cursor-pointer">
+                            <option value="Food" {% if expense.category == 'Food' %}selected{% endif %}>Food</option>
+                            <option value="Transport" {% if expense.category == 'Transport' %}selected{% endif %}>Transport</option>
+                            <option value="Shopping" {% if expense.category == 'Shopping' %}selected{% endif %}>Shopping</option>
+                            <option value="Entertainment" {% if expense.category == 'Entertainment' %}selected{% endif %}>Entertainment</option>
+                            <option value="Health" {% if expense.category == 'Health' %}selected{% endif %}>Health</option>
+                            <option value="Rent" {% if expense.category == 'Rent' %}selected{% endif %}>Rent</option>
+                            <option value="Utilities" {% if expense.category == 'Utilities' %}selected{% endif %}>Utilities</option>
+                            <option value="Miscellaneous" {% if expense.category == 'Miscellaneous' %}selected{% endif %}>Miscellaneous</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Payment Type -->
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Transfer_Protocol</label>
+                    <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5 relative">
+                        <select name="payment_type" class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none appearance-none cursor-pointer">
+                            <option value="Cash" {% if expense.payment_type == 'Cash' %}selected{% endif %}>Cash</option>
+                            <option value="Card" {% if expense.payment_type == 'Card' %}selected{% endif %}>Card / Debit</option>
+                            <option value="UPI" {% if expense.payment_type == 'UPI' %}selected{% endif %}>UPI / Digital</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-white/5 pt-8 flex flex-col sm:flex-row gap-4">
+                <button type="submit" class="machined-button flex-1 h-12 bg-primary text-text-main font-mono text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 group hover:bg-primary/90 transition-colors">
+                    <span class="material-symbols-outlined">save</span> Save Changes
+                </button>
+                <a href="{{ url_for('main.index') }}" class="machined-plate flex items-center justify-center px-6 h-12 text-text-muted hover:text-text-main font-mono text-[10px] uppercase tracking-wider transition-colors">
+                    Abort
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
