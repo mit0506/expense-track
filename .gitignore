@@ -1,0 +1,7 @@
+.env
+.venv/
+node_modules/
+__pycache__/
+expenses.db
+uploads/
+instance/
