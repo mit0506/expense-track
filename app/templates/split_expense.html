@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Split Expense{% endblock %}
+{% block header_title %}Node Splitter{% endblock %}
+{% block content %}
+<div class="max-w-[500px] mx-auto w-full">
+    <div class="machined-plate rounded-md overflow-hidden p-8 shadow-2xl relative">
+        <h3 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-muted mb-6">Initialize_Fractional_Debit</h3>
+        
+        <div class="bg-surface-inset p-4 rounded-sm border border-white/5 mb-8">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-[10px] font-mono text-text-muted uppercase">Base Transaction</span>
+                <span class="text-[10px] font-mono text-text-muted uppercase">{{ expense.date }}</span>
+            </div>
+            <div class="text-sm font-bold text-text-main">{{ expense.merchant }}</div>
+            <div class="text-lg font-mono text-primary mt-2">₹{{ "%.2f"|format(expense.amount) }}</div>
+        </div>
+
+        <form method="POST" class="flex flex-col gap-6">
+            <div class="flex flex-col gap-2">
+                <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Target_Debtor_Entity</label>
+                <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5 relative">
+                    <select name="debtor_id" required class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none appearance-none cursor-pointer">
+                        <option value="" disabled selected>Select Associate...</option>
+                        {% for user in users %}
+                        <option value="{{ user.id }}">{{ user.username }} (UID: {{ user.id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Split_Volume_INR</label>
+                <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
+                    <span class="text-text-muted font-mono text-xs mr-2">₹</span>
+                    <input type="number" step="0.01" name="amount" required class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none tabular-nums" placeholder="0.00">
+                </div>
+                <p class="text-[9px] font-mono text-text-muted/50 uppercase mt-1">Suggestion: Half Split = ₹{{ "%.2f"|format(expense.amount / 2) }}</p>
+            </div>
+
+            <button type="submit" class="machined-button h-12 bg-primary text-text-main font-mono text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 group hover:bg-primary/90 transition-colors mt-4">
+                <span class="material-symbols-outlined text-[18px]">call_split</span> Commit Split
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

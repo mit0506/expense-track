@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, current_app, flash, Response
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.models import db, Expense, UserProfile, CategoryBudget, Subscription
+from app.models import db, Expense, UserProfile, CategoryBudget, Subscription, BillSplit
 from app.utils import parse_sms, parse_receipt, generate_insights
 import pytesseract
 from PIL import Image
@@ -68,11 +68,18 @@ def inject_global_data():
     # Process due subscriptions right before building context!
     process_subscriptions(current_user.id)
     
+    # Calculate Split Balances
+    # Amount current_user OWES (as debtor)
+    i_owe = db.session.query(db.func.sum(BillSplit.amount)).filter_by(debtor_id=current_user.id, settled=False).scalar() or 0.0
+    # Amount OWED to current_user (as payer)
+    owed_to_me = db.session.query(db.func.sum(BillSplit.amount)).filter_by(payer_id=current_user.id, settled=False).scalar() or 0.0
+    net_balance = owed_to_me - i_owe
+
     expenses = Expense.query.filter_by(user_id=current_user.id).all()
     today = datetime.today()
     prefix = today.strftime('%Y-%m')
     total_spending = sum(float(e.amount or 0) for e in expenses if e.date and str(e.date).startswith(prefix))
-    return {'monthly_total': total_spending}
+    return {'monthly_total': total_spending, 'net_balance': net_balance}
 
 @main_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -262,6 +269,46 @@ def delete_subscription(sub_id):
     db.session.delete(sub)
     db.session.commit()
     return redirect(url_for('main.subscriptions'))
+
+@main_bp.route('/split/<int:expense_id>', methods=['GET', 'POST'])
+@login_required
+def split_expense(expense_id):
+    expense = Expense.query.filter(
+        (Expense.id == expense_id) & (Expense.user_id == current_user.id)
+    ).first_or_404()
+    
+    if request.method == 'POST':
+        debtor_id = int(request.form.get('debtor_id'))
+        split_amount = float(request.form.get('amount'))
+        
+        if split_amount > expense.amount:
+            flash("Split amount cannot exceed total transaction volume.")
+            return redirect(url_for('main.split_expense', expense_id=expense_id))
+            
+        new_split = BillSplit(
+            expense_id=expense.id,
+            payer_id=current_user.id,
+            debtor_id=debtor_id,
+            amount=split_amount
+        )
+        db.session.add(new_split)
+        db.session.commit()
+        flash(f"Split registered successfully! User node {debtor_id} now owes ₹{split_amount}.")
+        return redirect(url_for('main.index'))
+
+    # Fetch all other users for splitting
+    other_users = UserProfile.query.filter(UserProfile.id != current_user.id).all()
+    return render_template('split_expense.html', expense=expense, users=other_users)
+
+@main_bp.route('/settle/<int:split_id>', methods=['POST'])
+@login_required
+def settle_split(split_id):
+    split = BillSplit.query.filter(
+        (BillSplit.id == split_id) & ((BillSplit.payer_id == current_user.id) | (BillSplit.debtor_id == current_user.id))
+    ).first_or_404()
+    split.settled = True
+    db.session.commit()
+    return redirect(url_for('main.index'))
 
 @main_bp.route('/export_csv')
 @login_required
