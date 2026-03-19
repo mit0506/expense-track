@@ -118,9 +118,9 @@ def parse_receipt(text):
         'payment_type': payment_type
     }
 
-def generate_insights():
-    # Get all expenses
-    expenses = Expense.query.all()
+def generate_insights(user_id):
+    # Get all expenses for specific user
+    expenses = Expense.query.filter_by(user_id=user_id).all()
     expense_data = [e.to_dict() for e in expenses]
 
     if not expense_data:
