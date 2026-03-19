@@ -175,6 +175,19 @@
                             <div class="h-full {% if percent > 100 %}bg-primary{% else %}bg-accent-cyan{% endif %}" style="width: {{ display_width }}%"></div>
                         </div>
                     </div>
+
+                    <div class="bg-surface-inset p-3 rounded-sm border border-white/5">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-mono text-[10px] text-text-muted uppercase">Net Split Balance</span>
+                            <span class="material-symbols-outlined text-[14px] text-text-muted">balance</span>
+                        </div>
+                        <div class="font-mono text-sm {% if net_balance < 0 %}text-primary{% elif net_balance > 0 %}text-accent-cyan{% else %}text-text-main{% endif %} tabular-nums">
+                            {{ '₹%.2f'|format(net_balance) }}
+                        </div>
+                        <p class="text-[8px] font-mono text-text-muted/50 uppercase mt-1">
+                            {% if net_balance < 0 %}Net Debt Owed{% elif net_balance > 0 %}Net Credit Owed to You{% else %}Perfect Balance{% endif %}
+                        </p>
+                    </div>
                 </div>
             </div>
             <div class="p-6 flex-1 flex flex-col">
