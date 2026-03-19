@@ -42,6 +42,7 @@
                 </div>
                 <!-- Navigation -->
                 <nav class="flex flex-col gap-2">
+                    {% if current_user.is_authenticated %}
                     <a class="tactile-nav-item {% if request.endpoint == 'main.index' %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-all group" href="{{ url_for('main.index') }}">
                         <span class="material-symbols-outlined text-[18px] transition-transform group-hover:scale-110">space_dashboard</span>
                         <span class="font-mono uppercase tracking-wider text-[11px]">Dashboard</span>
@@ -54,18 +55,25 @@
                         <span class="material-symbols-outlined text-[18px] transition-transform group-hover:scale-110">lightbulb</span>
                         <span class="font-mono uppercase tracking-wider text-[11px]">Insights</span>
                     </a>
+                    <a class="tactile-nav-item {% if request.endpoint == 'main.subscriptions' %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-all group" href="{{ url_for('main.subscriptions') }}">
+                        <span class="material-symbols-outlined text-[18px] transition-transform group-hover:scale-110">update</span>
+                        <span class="font-mono uppercase tracking-wider text-[11px]">Subscriptions</span>
+                    </a>
                     <a class="tactile-nav-item {% if request.endpoint == 'main.profile' %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-all group" href="{{ url_for('main.profile') }}">
                         <span class="material-symbols-outlined text-[18px] transition-transform group-hover:scale-110">account_circle</span>
                         <span class="font-mono uppercase tracking-wider text-[11px]">Settings</span>
                     </a>
+                    {% endif %}
                 </nav>
             </div>
             <!-- Bottom Actions -->
             <div class="p-6 border-t border-white/5">
+                {% if current_user.is_authenticated %}
                 <a href="{{ url_for('main.add_manual') }}" class="machined-button w-full flex cursor-pointer items-center justify-center overflow-hidden rounded-sm h-12 px-4 bg-primary text-text-main text-xs font-mono font-bold tracking-[0.05em] uppercase">
                     <span class="material-symbols-outlined mr-2 text-[18px]">add</span>
                     Add Expense
                 </a>
+                {% endif %}
             </div>
         </aside>
 
@@ -92,17 +100,19 @@
 
                     <!-- Profile Info -->
                     <div class="flex items-center gap-2 lg:gap-3">
-                        <div class="text-right flex flex-col hidden sm:flex">
-                            <span class="text-xs font-bold text-text-main">{{ user_profile.name if user_profile else 'User' }}</span>
-                            <span class="text-[10px] font-mono text-text-muted uppercase">Ready</span>
+                        {% if current_user.is_authenticated %}
+                        <div class="text-right flex-col hidden sm:flex">
+                            <span class="text-xs font-bold text-text-main">{{ current_user.name if current_user.name else current_user.username }}</span>
+                            <a href="{{ url_for('main.logout') }}" class="text-[10px] font-mono text-primary hover:underline uppercase">Logout User</a>
                         </div>
                         <div class="w-8 h-8 rounded-sm machined-plate overflow-hidden border border-white/10 shrink-0">
-                            {% if user_profile and user_profile.avatar %}
-                                <img src="{{ url_for('static', filename='avatars/' + user_profile.avatar) }}" alt="Avatar" class="w-full h-full object-cover">
+                            {% if current_user.avatar %}
+                                <img src="{{ url_for('static', filename='avatars/' + current_user.avatar) }}" alt="Avatar" class="w-full h-full object-cover">
                             {% else %}
                                 <img src="{{ url_for('static', filename='avatars/default_avatar.png') }}" alt="Avatar" class="w-full h-full object-cover">
                             {% endif %}
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </header>
@@ -142,6 +152,7 @@
 
         <!-- Right Context Panel (Optional) -->
         {% block right_panel %}
+        {% if current_user.is_authenticated %}
         <aside class="w-[300px] h-full machined-plate border-l border-white/5 z-20 shrink-0 hidden xl:flex flex-col">
             <div class="p-6 border-b border-white/5">
                 <h3 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-muted mb-4">System_Status</h3>
@@ -152,14 +163,14 @@
                             <span class="material-symbols-outlined text-[14px] text-text-muted">data_usage</span>
                         </div>
                         <div class="font-mono text-sm text-text-main tabular-nums">
-                            {% if user_profile and user_profile.monthly_target %}
-                                ₹{{ '%.2f'|format(monthly_total) }} / ₹{{ '%.2f'|format(user_profile.monthly_target) }}
+                            {% if current_user.monthly_target %}
+                                ₹{{ '%.2f'|format(monthly_total) }} / ₹{{ '%.2f'|format(current_user.monthly_target) }}
                             {% else %}
                                 ₹{{ '%.2f'|format(monthly_total) }}
                             {% endif %}
                         </div>
                         <div class="w-full h-1 bg-surface mt-2 rounded-full overflow-hidden border border-white/5">
-                            {% set percent = (monthly_total / user_profile.monthly_target * 100) if user_profile and user_profile.monthly_target and user_profile.monthly_target > 0 else 0 %}
+                            {% set percent = (monthly_total / current_user.monthly_target * 100) if current_user.monthly_target and current_user.monthly_target > 0 else 0 %}
                             {% set display_width = percent if percent <= 100 else 100 %}
                             <div class="h-full {% if percent > 100 %}bg-primary{% else %}bg-accent-cyan{% endif %}" style="width: {{ display_width }}%"></div>
                         </div>
@@ -180,6 +191,7 @@
                 </div>
             </div>
         </aside>
+        {% endif %}
         {% endblock %}
     </div>
     {% block scripts %}{% endblock %}

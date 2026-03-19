@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Subscriptions{% endblock %}
+{% block header_title %}Recurring Nodes{% endblock %}
+{% block content %}
+<div class="flex flex-col gap-6">
+
+    <!-- Add Subscription -->
+    <div class="machined-plate p-6 rounded-md border border-white/5 relative z-10 w-full lg:max-w-[700px]">
+        <h3 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-muted mb-6">Initialize_Recurring_Pattern</h3>
+        <form method="POST" action="{{ url_for('main.subscriptions') }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-2">
+                <label class="text-[9px] font-mono text-text-muted uppercase tracking-widest px-1">Entity_Merchant</label>
+                <div class="machined-inset h-10 rounded-sm flex items-center px-4 border border-white/5">
+                    <input type="text" name="merchant" required class="bg-transparent border-none text-[10px] font-mono text-text-main w-full focus:outline-none placeholder-text-muted/30" placeholder="e.g. Netflix">
+                </div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="text-[9px] font-mono text-text-muted uppercase tracking-widest px-1">Amount_INR</label>
+                <div class="machined-inset h-10 rounded-sm flex items-center px-4 border border-white/5">
+                    <span class="text-text-muted font-mono text-[10px] mr-2">₹</span>
+                    <input type="number" step="0.01" name="amount" required class="bg-transparent border-none text-[10px] font-mono text-text-main w-full focus:outline-none tabular-nums" placeholder="0.00">
+                </div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="text-[9px] font-mono text-text-muted uppercase tracking-widest px-1">Classification</label>
+                <div class="machined-inset h-10 rounded-sm flex items-center px-4 border border-white/5 relative">
+                    <select name="category" class="bg-transparent border-none text-[10px] font-mono text-text-main w-full focus:outline-none appearance-none cursor-pointer">
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Rent">Rent</option>
+                        <option value="Health">Health</option>
+                        <option value="Food">Food</option>
+                        <option value="Miscellaneous">Miscellaneous</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="text-[9px] font-mono text-text-muted uppercase tracking-widest px-1">Frequency</label>
+                <div class="machined-inset h-10 rounded-sm flex items-center px-4 border border-white/5 relative">
+                    <select name="billing_cycle" class="bg-transparent border-none text-[10px] font-mono text-text-main w-full focus:outline-none appearance-none cursor-pointer">
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2 md:col-span-2">
+                <label class="text-[9px] font-mono text-text-muted uppercase tracking-widest px-1">Next_Execution_Date</label>
+                <div class="machined-inset h-10 rounded-sm flex items-center px-4 border border-white/5">
+                    <input type="date" name="next_billing_date" required class="bg-transparent border-none text-[10px] font-mono text-text-main w-full focus:outline-none [color-scheme:dark]">
+                </div>
+            </div>
+            
+            <div class="md:col-span-2 mt-2">
+                <button type="submit" class="machined-button h-10 w-full bg-accent-cyan/80 text-text-main font-mono text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 group hover:bg-accent-cyan transition-colors">
+                    <span class="material-symbols-outlined text-[16px]">add_circle</span> Inject Node
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Active Subscriptions -->
+    <div class="machined-plate rounded-sm overflow-hidden border border-white/5 relative z-10 w-full lg:max-w-[700px]">
+        <div class="bg-surface-inset px-4 py-3 flex justify-between items-center border-b border-white/5">
+            <span class="text-[9px] font-mono text-text-muted uppercase tracking-widest">Active_Automations</span>
+            <span class="text-[9px] font-mono text-accent-cyan uppercase">{{ subscriptions|length }} nodes</span>
+        </div>
+        {% if subscriptions %}
+        <div class="flex flex-col">
+            {% for sub in subscriptions %}
+            <div class="px-4 py-4 border-b border-white/5 hover:bg-white/[0.02] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full machined-inset flex items-center justify-center shrink-0 border border-white/5">
+                        <span class="material-symbols-outlined text-text-muted text-[18px]">event_repeat</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-bold text-text-main">{{ sub.merchant }}</span>
+                            <span class="px-1.5 py-0.5 rounded-sm bg-surface-inset text-[8px] font-mono text-text-muted uppercase tracking-wider border border-white/5">{{ sub.category }}</span>
+                        </div>
+                        <div class="text-[10px] font-mono text-text-muted mt-1 uppercase tracking-wider">
+                            Next: <span class="text-accent-cyan">{{ sub.next_billing_date }}</span> // <span class="text-primary">{{ sub.billing_cycle }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between sm:justify-end gap-6 sm:gap-4 w-full sm:w-auto">
+                    <div class="text-right">
+                        <div class="text-sm font-mono font-bold text-text-main tabular-nums block">₹{{ "%.2f"|format(sub.amount) }}</div>
+                    </div>
+                    <form method="POST" action="{{ url_for('main.delete_subscription', sub_id=sub.id) }}">
+                        <button type="submit" class="w-8 h-8 rounded-sm machined-plate flex items-center justify-center text-text-muted hover:text-primary hover:border-primary/50 transition-all active:scale-95" onclick="return confirm('Terminate this automation node?')">
+                            <span class="material-symbols-outlined text-[16px]">delete</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-8 text-center flex flex-col items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-text-muted/30 text-4xl mb-2 block">robot_2</span>
+            <span class="text-sm text-text-muted font-mono uppercase tracking-widest block">No automated nodes detected</span>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
