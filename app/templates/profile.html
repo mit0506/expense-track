@@ -19,16 +19,24 @@
         <form method="POST" enctype="multipart/form-data" class="flex flex-col gap-8">
             <!-- Profile Identity -->
             <div class="flex flex-col md:flex-row gap-8 items-center md:items-start">
-                <div class="relative group">
-                    <div class="w-32 h-32 rounded-sm machined-plate overflow-hidden border-2 border-white/5 group-hover:border-accent-cyan/50 transition-colors">
-                        <img id="avatar-preview" src="{{ url_for('static', filename='avatars/' + (profile.avatar or 'default_avatar.png')) }}" 
-                             alt="Avatar" class="w-full h-full object-cover">
+                <div class="flex flex-col items-center gap-3">
+                    <div class="relative group">
+                        <div class="w-32 h-32 rounded-sm machined-plate overflow-hidden border-2 border-white/5 group-hover:border-accent-cyan/50 transition-colors">
+                            <img id="avatar-preview" src="{{ url_for('static', filename='avatars/' + (profile.avatar or 'default_avatar.png')) }}" 
+                                 alt="Avatar" class="w-full h-full object-cover">
+                        </div>
+                        <label class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                            <span class="material-symbols-outlined text-white text-[24px]">photo_camera</span>
+                            <span class="text-[8px] font-mono text-white uppercase mt-1">Upload_ID</span>
+                            <input type="file" name="avatar" id="avatar-input" accept="image/*" class="hidden">
+                        </label>
                     </div>
-                    <label class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                        <span class="material-symbols-outlined text-white text-[24px]">photo_camera</span>
-                        <span class="text-[8px] font-mono text-white uppercase mt-1">Upload_ID</span>
-                        <input type="file" name="avatar" id="avatar-input" accept="image/*" class="hidden">
+                    {% if profile.avatar %}
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <input type="checkbox" name="delete_avatar" id="delete_avatar_checkbox" class="rounded border-white/10 bg-black/50 text-red-500 focus:ring-red-500 focus:ring-offset-black">
+                        <span class="text-[10px] font-mono text-red-400 group-hover:text-red-300 transition-colors uppercase tracking-widest">Delete_Photo</span>
                     </label>
+                    {% endif %}
                 </div>
 
                 <div class="flex-1 flex flex-col gap-6 w-full">
@@ -91,6 +99,8 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 preview.src = e.target.result;
+                const delCheckbox = document.getElementById('delete_avatar_checkbox');
+                if (delCheckbox) delCheckbox.checked = false;
             }
             reader.readAsDataURL(file);
         }
