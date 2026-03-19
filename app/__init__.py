@@ -4,20 +4,30 @@ from app.models import db, UserProfile
 from sqlalchemy import text
 import pytesseract
 from dotenv import load_dotenv
+from flask_login import LoginManager
 
 load_dotenv()
+
+login_manager = LoginManager()
+login_manager.login_view = 'main.login'
 
 def create_app():
     app = Flask(__name__, 
                 static_folder='static',
                 template_folder='templates')
     
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://root:password@localhost/expense_track')
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_default_key_123')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///expenses.db')
     app.config['UPLOAD_FOLDER'] = 'uploads'
     app.config['MONTHLY_INCOME'] = 50000  # Default monthly income
 
-    # Database initialization
+    # Database and Login initialization
     db.init_app(app)
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return UserProfile.query.get(int(user_id))
 
     # optional AI chatbot integration
     try:
@@ -39,30 +49,8 @@ def create_app():
     from app.routes import main_bp
     app.register_blueprint(main_bp)
 
-    # Database setup and migrations
+    # Database setup
     with app.app_context():
         db.create_all()
-        ensure_profile_columns(db)
 
     return app
-
-def ensure_profile_columns(db):
-    inspector = db.inspect(db.engine)
-    if 'user_profile' in inspector.get_table_names():
-        cols = [c['name'] for c in inspector.get_columns('user_profile')]
-        if 'monthly_target' not in cols:
-            try:
-                with db.engine.connect() as conn:
-                    conn.execute(text('ALTER TABLE user_profile ADD COLUMN monthly_target FLOAT DEFAULT 0.0'))
-                    conn.commit()
-                print('Added monthly_target column to user_profile')
-            except Exception as e:
-                print('Failed to add monthly_target column:', e)
-        if 'avatar' not in cols:
-            try:
-                with db.engine.connect() as conn:
-                    conn.execute(text('ALTER TABLE user_profile ADD COLUMN avatar VARCHAR(200)'))
-                    conn.commit()
-                print('Added avatar column to user_profile')
-            except Exception as e:
-                print('Failed to add avatar column:', e)
