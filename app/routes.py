@@ -80,16 +80,26 @@ def profile():
             profile.monthly_target = float(request.form.get('monthly_target', profile.monthly_target))
         except ValueError:
             pass
-        # handle avatar upload
-        file = request.files.get('avatar')
-        if file and file.filename:
-            filename = file.filename
-            avatar_dir = os.path.join(str(current_app.static_folder), 'avatars')
-            if not os.path.exists(avatar_dir):
-                os.makedirs(avatar_dir)
-            filepath = os.path.join(avatar_dir, filename)
-            file.save(filepath)
-            profile.avatar = filename
+        # handle avatar upload and deletion
+        if request.form.get('delete_avatar'):
+            if profile.avatar:
+                old_avatar_path = os.path.join(str(current_app.static_folder), 'avatars', profile.avatar)
+                if os.path.exists(old_avatar_path):
+                    try:
+                        os.remove(old_avatar_path)
+                    except Exception:
+                        pass
+                profile.avatar = None
+        else:
+            file = request.files.get('avatar')
+            if file and file.filename:
+                filename = file.filename
+                avatar_dir = os.path.join(str(current_app.static_folder), 'avatars')
+                if not os.path.exists(avatar_dir):
+                    os.makedirs(avatar_dir)
+                filepath = os.path.join(avatar_dir, filename)
+                file.save(filepath)
+                profile.avatar = filename
         db.session.commit()
         return redirect(url_for('main.index'))
     return render_template('profile.html', profile=profile)
