@@ -51,6 +51,14 @@ class Subscription(db.Model):
     next_billing_date = db.Column(db.String(20), nullable=False)
     auto_log = db.Column(db.Boolean, default=True)
 
+class BillSplit(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    expense_id = db.Column(db.Integer, db.ForeignKey('expense.id'), nullable=False)
+    payer_id = db.Column(db.Integer, db.ForeignKey('user_profile.id'), nullable=False)
+    debtor_id = db.Column(db.Integer, db.ForeignKey('user_profile.id'), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    settled = db.Column(db.Boolean, default=False)
+
 class UserProfile(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
