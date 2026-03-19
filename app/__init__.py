@@ -3,13 +3,16 @@ from flask import Flask
 from app.models import db, UserProfile
 from sqlalchemy import text
 import pytesseract
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def create_app():
     app = Flask(__name__, 
                 static_folder='static',
                 template_folder='templates')
     
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///expenses.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://root:password@localhost/expense_track')
     app.config['UPLOAD_FOLDER'] = 'uploads'
     app.config['MONTHLY_INCOME'] = 50000  # Default monthly income
 
