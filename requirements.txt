@@ -2,3 +2,5 @@ Flask
 Flask-SQLAlchemy
 pytesseract
 Pillow
+PyMySQL
+python-dotenv
