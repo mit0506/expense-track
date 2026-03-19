@@ -3,4 +3,6 @@ Flask-SQLAlchemy
 pytesseract
 Pillow
 PyMySQL
-python-dotenv
+python-dotenv
+Flask-Login
+Werkzeug

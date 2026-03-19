@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block header_title %}User Registration{% endblock %}
+{% block content %}
+<div class="max-w-[400px] mx-auto w-full mt-10">
+    <div class="machined-plate rounded-md overflow-hidden p-8 shadow-2xl relative">
+        <h2 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-muted mb-6">Create Account</h2>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="text-[10px] text-primary mb-4 border border-primary/20 bg-primary/5 p-2 rounded-sm font-mono uppercase">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('main.register') }}" class="flex flex-col gap-6">
+            <div class="flex flex-col gap-2">
+                <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Username</label>
+                <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
+                    <input type="text" name="username" required class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0" placeholder="Choose a Username">
+                </div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Password</label>
+                <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
+                    <input type="password" name="password" required class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0" placeholder="Choose a Password">
+                </div>
+            </div>
+            <button type="submit" class="machined-button h-12 bg-accent-cyan/80 text-text-main font-mono font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-accent-cyan mt-4">
+                Register
+            </button>
+        </form>
+        <div class="mt-6 text-center">
+            <p class="text-[10px] text-text-muted font-mono uppercase">Already have an account? <a href="{{ url_for('main.login') }}" class="text-primary hover:underline">Login Here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
