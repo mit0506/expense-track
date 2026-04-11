@@ -20,3 +20,6 @@ uploads/
 *.db
 .gemini/
 .DS_Store
+.env.docker
+tests/
+*.md

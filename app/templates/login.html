@@ -13,6 +13,7 @@
           {% endif %}
         {% endwith %}
         <form method="POST" action="{{ url_for('main.login') }}" class="flex flex-col gap-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="flex flex-col gap-2">
                 <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Username</label>
                 <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">

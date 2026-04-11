@@ -195,14 +195,25 @@
 
             const barContainer = document.createElement('div');
             barContainer.className = 'relative w-full flex flex-col items-center justify-end h-full group';
-            barContainer.innerHTML = `
-                <div class="w-full bg-text-muted bar-chart-col relative rounded-t-sm" style="height: ${heightPercent}%">
-                    <div class="tooltip machined-plate px-3 py-2 rounded-sm border border-white/10 shadow-2xl">
-                        <span class="font-mono text-accent-cyan text-[10px] whitespace-nowrap">₹${val.toFixed(2)}</span>
-                    </div>
-                </div>
-                <span class="absolute -bottom-6 text-text-muted font-mono text-[8px] uppercase">${shortLabel}</span>
-            `;
+
+            const bar = document.createElement('div');
+            bar.className = 'w-full bg-text-muted bar-chart-col relative rounded-t-sm';
+            bar.style.height = `${heightPercent}%`;
+
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip machined-plate px-3 py-2 rounded-sm border border-white/10 shadow-2xl';
+            const tooltipSpan = document.createElement('span');
+            tooltipSpan.className = 'font-mono text-accent-cyan text-[10px] whitespace-nowrap';
+            tooltipSpan.textContent = `₹${val.toFixed(2)}`;
+            tooltip.appendChild(tooltipSpan);
+            bar.appendChild(tooltip);
+
+            const labelSpan = document.createElement('span');
+            labelSpan.className = 'absolute -bottom-6 text-text-muted font-mono text-[8px] uppercase';
+            labelSpan.textContent = shortLabel;
+
+            barContainer.appendChild(bar);
+            barContainer.appendChild(labelSpan);
             wrapper.appendChild(barContainer);
         });
 
@@ -220,21 +231,48 @@
             const row = document.createElement('div');
             const isEven = i % 2 === 0;
             row.className = `grid grid-cols-6 sm:grid-cols-12 gap-2 sm:gap-4 px-4 py-3 ${isEven ? 'bg-surface' : 'bg-surface-alt'} hover:bg-[#222226] border-b border-white/5 items-center cursor-pointer group transition-colors`;
-            
-            row.innerHTML = `
-                <div class="col-span-1 hidden sm:block font-mono text-text-muted text-[10px]">${(i+1).toString().padStart(2, '0')}</div>
-                <div class="col-span-3 sm:col-span-4 font-mono text-xs text-text-main flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[16px] text-text-muted group-hover:text-primary transition-colors">hub</span>
-                    <span class="truncate">${label.toUpperCase()}</span>
-                </div>
-                <div class="col-span-1 hidden sm:flex sm:col-span-5 items-center gap-3">
-                    <div class="flex-1 h-2 machined-inset rounded-sm overflow-hidden">
-                        <div class="h-full bg-primary/40 group-hover:bg-primary transition-all rounded-sm shadow-[0_0_8px_rgba(242,84,45,0.2)]" style="width: ${percent}%"></div>
-                    </div>
-                    <span class="font-mono text-[10px] text-text-muted w-10 text-right">${percent.toFixed(0)}%</span>
-                </div>
-                <div class="col-span-3 sm:col-span-2 text-right font-mono text-xs text-text-main tabular-nums">${val.toFixed(2)}</div>
-            `;
+
+            // ID column
+            const idCol = document.createElement('div');
+            idCol.className = 'col-span-1 hidden sm:block font-mono text-text-muted text-[10px]';
+            idCol.textContent = (i+1).toString().padStart(2, '0');
+
+            // Category column
+            const catCol = document.createElement('div');
+            catCol.className = 'col-span-3 sm:col-span-4 font-mono text-xs text-text-main flex items-center gap-2';
+            const catIcon = document.createElement('span');
+            catIcon.className = 'material-symbols-outlined text-[16px] text-text-muted group-hover:text-primary transition-colors';
+            catIcon.textContent = 'hub';
+            const catName = document.createElement('span');
+            catName.className = 'truncate';
+            catName.textContent = label.toUpperCase();
+            catCol.appendChild(catIcon);
+            catCol.appendChild(catName);
+
+            // Progress bar column
+            const barCol = document.createElement('div');
+            barCol.className = 'col-span-1 hidden sm:flex sm:col-span-5 items-center gap-3';
+            const barOuter = document.createElement('div');
+            barOuter.className = 'flex-1 h-2 machined-inset rounded-sm overflow-hidden';
+            const barInner = document.createElement('div');
+            barInner.className = 'h-full bg-primary/40 group-hover:bg-primary transition-all rounded-sm shadow-[0_0_8px_rgba(242,84,45,0.2)]';
+            barInner.style.width = `${percent}%`;
+            barOuter.appendChild(barInner);
+            const pctSpan = document.createElement('span');
+            pctSpan.className = 'font-mono text-[10px] text-text-muted w-10 text-right';
+            pctSpan.textContent = `${percent.toFixed(0)}%`;
+            barCol.appendChild(barOuter);
+            barCol.appendChild(pctSpan);
+
+            // Value column
+            const valCol = document.createElement('div');
+            valCol.className = 'col-span-3 sm:col-span-2 text-right font-mono text-xs text-text-main tabular-nums';
+            valCol.textContent = val.toFixed(2);
+
+            row.appendChild(idCol);
+            row.appendChild(catCol);
+            row.appendChild(barCol);
+            row.appendChild(valCol);
             list.appendChild(row);
         });
     }
