@@ -1,8 +1,12 @@
 Flask
 Flask-SQLAlchemy
+Flask-WTF
 pytesseract
 Pillow
 PyMySQL
 python-dotenv
 Flask-Login
+Flask-Limiter
+Flask-Migrate
 Werkzeug
+Flask-Bcrypt

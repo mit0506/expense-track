@@ -332,6 +332,7 @@ content %}
               method="post"
               action="{{ url_for('main.delete_expense', expense_id=expense.id) }}"
               class="flex">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <button
                 type="submit"
                 class="w-8 h-8 rounded-sm machined-plate flex items-center justify-center text-text-muted hover:text-primary hover:border-primary/50 transition-all active:scale-95"
@@ -375,5 +376,36 @@ content %}
       {% endif %}
     </div>
   </div>
+
+  {% if pagination and pagination.pages > 1 %}
+  <div class="flex items-center justify-center gap-2 mt-6">
+    {% if pagination.has_prev %}
+    <a href="{{ url_for('main.index', page=pagination.prev_num) }}"
+       class="machined-plate px-3 py-2 text-[10px] font-mono text-text-muted hover:text-text-main uppercase tracking-widest transition-colors">
+      &laquo; Prev
+    </a>
+    {% endif %}
+
+    {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if p %}
+        {% if p == pagination.page %}
+        <span class="machined-button px-3 py-2 bg-primary text-text-main text-[10px] font-mono font-bold tabular-nums">{{ p }}</span>
+        {% else %}
+        <a href="{{ url_for('main.index', page=p) }}"
+           class="machined-plate px-3 py-2 text-[10px] font-mono text-text-muted hover:text-text-main tabular-nums transition-colors">{{ p }}</a>
+        {% endif %}
+      {% else %}
+        <span class="text-text-muted/30 font-mono text-[10px] px-1">&hellip;</span>
+      {% endif %}
+    {% endfor %}
+
+    {% if pagination.has_next %}
+    <a href="{{ url_for('main.index', page=pagination.next_num) }}"
+       class="machined-plate px-3 py-2 text-[10px] font-mono text-text-muted hover:text-text-main uppercase tracking-widest transition-colors">
+      Next &raquo;
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
 </section>
 {% endblock %}

@@ -3,35 +3,39 @@ version: '3.8'
 services:
   db:
     image: mysql:8.0
-    restart: always
-    environment:
-      MYSQL_DATABASE: expense_tracker
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+    restart: on-failure
+    env_file: .env.docker
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
 
   app:
     build: .
-    restart: always
-    environment:
-      - DATABASE_URL=mysql+pymysql://user:password@db:3306/expense_tracker
-      - SECRET_KEY=dev_secret_key_change_me
+    restart: on-failure
+    env_file: .env.docker
     ports:
-      - "5000:5000"
+      - "127.0.0.1:5000:5000"
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - ./uploads:/app/uploads
       - ./instance:/app/instance
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
 
 volumes:
   mysql_data:
