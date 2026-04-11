@@ -8,6 +8,7 @@
     <div class="machined-plate p-6 rounded-md border border-white/5 relative z-10 w-full lg:max-w-[700px]">
         <h3 class="text-xs font-mono font-bold tracking-[0.05em] uppercase text-text-muted mb-6">Initialize_Recurring_Pattern</h3>
         <form method="POST" action="{{ url_for('main.subscriptions') }}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="flex flex-col gap-2">
                 <label class="text-[9px] font-mono text-text-muted uppercase tracking-widest px-1">Entity_Merchant</label>
                 <div class="machined-inset h-10 rounded-sm flex items-center px-4 border border-white/5">
@@ -87,6 +88,7 @@
                         <div class="text-sm font-mono font-bold text-text-main tabular-nums block">₹{{ "%.2f"|format(sub.amount) }}</div>
                     </div>
                     <form method="POST" action="{{ url_for('main.delete_subscription', sub_id=sub.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="w-8 h-8 rounded-sm machined-plate flex items-center justify-center text-text-muted hover:text-primary hover:border-primary/50 transition-all active:scale-95" onclick="return confirm('Terminate this automation node?')">
                             <span class="material-symbols-outlined text-[16px]">delete</span>
                         </button>
