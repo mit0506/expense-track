@@ -18,3 +18,4 @@ make_avatar.py
 .idea/
 .DS_Store
 .claude
+.env.docker
