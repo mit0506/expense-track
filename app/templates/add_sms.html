@@ -15,6 +15,7 @@
         </header>
 
         <form method="POST" class="flex flex-col gap-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <!-- SMS Text Area -->
             <div class="flex flex-col gap-2">
                 <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Raw_Text_Buffer</label>
