@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from app.models import db, UserProfile, CategoryBudget
 from app.constants import EXPENSE_CATEGORIES, ALLOWED_AVATAR_EXTENSIONS
+from app.validators import validate_username, validate_password, sanitize_string, validate_amount
 from app.routes import main_bp
 from app import limiter
 
@@ -22,14 +23,16 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     if request.method == 'POST':
-        username = request.form.get('username', '').strip()
+        raw_username = request.form.get('username', '')
         password = request.form.get('password', '')
 
-        if not username or len(username) > 100:
-            flash('Username must be between 1 and 100 characters.')
+        username, err = validate_username(raw_username)
+        if err:
+            flash(err)
             return redirect(url_for('main.register'))
-        if len(password) < 6:
-            flash('Password must be at least 6 characters.')
+        password, err = validate_password(password)
+        if err:
+            flash(err)
             return redirect(url_for('main.register'))
 
         if UserProfile.query.filter_by(username=username).first():
@@ -76,13 +79,13 @@ def logout():
 @login_required
 def profile():
     if request.method == 'POST':
-        current_user.name = request.form.get('name', current_user.name)
+        current_user.name = sanitize_string(request.form.get('name', current_user.name), max_length=100)
         try:
             income = float(request.form.get('monthly_income', current_user.monthly_income))
             target = float(request.form.get('monthly_target', current_user.monthly_target))
-            if income >= 0:
+            if 0 <= income <= 99_999_999:
                 current_user.monthly_income = income
-            if target >= 0:
+            if 0 <= target <= 99_999_999:
                 current_user.monthly_target = target
         except (ValueError, TypeError):
             logger.warning("Invalid income/target values submitted by user %s", current_user.id)
