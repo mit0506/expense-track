@@ -5,6 +5,7 @@
 <div class="max-w-[700px] mx-auto w-full">
     <div class="machined-plate rounded-md overflow-hidden p-8 shadow-2xl relative">
         <form method="POST" action="{{ url_for('main.edit_expense', expense_id=expense.id) }}" class="flex flex-col gap-8">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                 <!-- Date -->
                 <div class="flex flex-col gap-2">
