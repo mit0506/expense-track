@@ -5,6 +5,7 @@ from sqlalchemy import Numeric
 
 db = SQLAlchemy()
 
+
 class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user_profile.id'), nullable=False, index=True)
@@ -25,13 +26,17 @@ class Expense(db.Model):
             'payment_type': self.payment_type
         }
 
-    def __init__(self, user_id, date: str = '', merchant: str = '', amount: float = 0.0, category: str = 'Miscellaneous', payment_type: str = 'Cash'):
+    def __init__(
+        self, user_id, date: str = '', merchant: str = '',
+        amount: float = 0.0, category: str = 'Miscellaneous', payment_type: str = 'Cash'
+    ):
         self.user_id = user_id
         self.date = date
         self.merchant = merchant
         self.amount = amount
         self.category = category
         self.payment_type = payment_type
+
 
 class CategoryBudget(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -42,6 +47,7 @@ class CategoryBudget(db.Model):
 
     def to_dict(self):
         return {'category': self.category, 'amount': float(self.amount) if self.amount else 0.0}
+
 
 class Subscription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -54,6 +60,7 @@ class Subscription(db.Model):
     auto_log = db.Column(db.Boolean, default=True)
     last_processed = db.Column(db.String(20), nullable=True)
 
+
 class BillSplit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     expense_id = db.Column(db.Integer, db.ForeignKey('expense.id'), nullable=False, index=True)
@@ -61,6 +68,7 @@ class BillSplit(db.Model):
     debtor_id = db.Column(db.Integer, db.ForeignKey('user_profile.id'), nullable=False, index=True)
     amount = db.Column(Numeric(10, 2), nullable=False)
     settled = db.Column(db.Boolean, default=False)
+
 
 class UserProfile(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -82,7 +90,11 @@ class UserProfile(UserMixin, db.Model):
             'avatar': self.avatar
         }
 
-    def __init__(self, username, password_hash, name: str = 'User', monthly_income: float = 0.0, monthly_target: float = 0.0, avatar: str | None = None):
+    def __init__(
+        self, username, password_hash, name: str = 'User',
+        monthly_income: float = 0.0, monthly_target: float = 0.0,
+        avatar: str | None = None
+    ):
         self.username = username
         self.password_hash = password_hash
         self.name = name
