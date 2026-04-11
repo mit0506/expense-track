@@ -20,6 +20,7 @@ def test_register_short_password(client):
 
 def test_register_duplicate_username(client):
     client.post('/register', data={'username': 'dupuser', 'password': 'password123'})
+    client.get('/logout')
     resp = client.post('/register', data={
         'username': 'dupuser',
         'password': 'password456',

@@ -5,6 +5,7 @@ from flask_login import login_required, current_user
 from app.models import db, Expense
 from app.routes import main_bp
 from app.utils import generate_insights
+from app import limiter
 
 try:
     import openai  # type: ignore[import]
@@ -32,6 +33,7 @@ def visualize():
 
 @main_bp.route('/api/expenses')
 @login_required
+@limiter.limit("60 per minute")
 def api_expenses():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 50, type=int)
@@ -97,6 +99,7 @@ def _build_visualization_response(filtered):
 
 @main_bp.route('/api/visualization/<period>')
 @login_required
+@limiter.limit("30 per minute")
 def get_visualization_data(period):
     if period not in VALID_PERIODS:
         return jsonify({'error': 'Invalid period'}), 400
@@ -106,6 +109,7 @@ def get_visualization_data(period):
 
 @main_bp.route('/api/visualization/custom')
 @login_required
+@limiter.limit("30 per minute")
 def get_custom_visualization():
     start = request.args.get('start')
     end = request.args.get('end')
@@ -131,9 +135,12 @@ def get_custom_visualization():
 
 @main_bp.route('/chat', methods=['POST'])
 @login_required
+@limiter.limit("10 per minute")
 def chat():
-    data = request.get_json() or {}
-    q = data.get('question', '').lower()
+    data = request.get_json(silent=True) or {}
+    q = str(data.get('question', ''))[:500].lower()
+    if not q.strip():
+        return jsonify({'error': 'Question is required.'}), 400
 
     if openai and getattr(openai, 'api_key', None):
         total = (
