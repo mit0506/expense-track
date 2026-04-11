@@ -1,15 +1,18 @@
 import os
 import csv
 import logging
-from io import StringIO
+from io import StringIO, BytesIO
 from datetime import datetime
 from flask import render_template, request, redirect, url_for, current_app, flash, Response
+from fpdf import FPDF
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from app.models import db, Expense, UserProfile, CategoryBudget, BillSplit
 from app.utils import parse_sms, parse_receipt
 from app.constants import EXPENSE_CATEGORIES, MAX_EXPENSE_AMOUNT
+from app.validators import validate_amount, validate_category, validate_payment_type, validate_date, sanitize_string
 from app.routes import main_bp
+from app import limiter
 
 try:
     import pytesseract
@@ -105,18 +108,28 @@ def index():
 @login_required
 def add_manual():
     if request.method == 'POST':
-        amount = _validate_amount(request.form.get('amount'))
+        amount = validate_amount(request.form.get('amount'))
         if amount is None:
             flash('Invalid amount. Must be between 0.01 and 9,999,999.99.')
             return redirect(url_for('main.add_manual'))
 
+        date_str = validate_date(request.form.get('date', ''))
+        if date_str is None:
+            flash('Invalid date. Use YYYY-MM-DD format.')
+            return redirect(url_for('main.add_manual'))
+
+        merchant = sanitize_string(request.form.get('merchant', ''), max_length=100)
+        if not merchant:
+            flash('Merchant name is required.')
+            return redirect(url_for('main.add_manual'))
+
         expense = Expense(
             user_id=current_user.id,
-            date=request.form.get('date', ''),
-            merchant=request.form.get('merchant', '')[:100],
+            date=date_str,
+            merchant=merchant,
             amount=amount,
-            category=_validate_category(request.form.get('category', 'Miscellaneous')),
-            payment_type=request.form.get('payment_type', 'Cash'),
+            category=validate_category(request.form.get('category', 'Miscellaneous')),
+            payment_type=validate_payment_type(request.form.get('payment_type', 'Cash')),
         )
         db.session.add(expense)
         db.session.commit()
@@ -129,16 +142,21 @@ def add_manual():
 def edit_expense(expense_id):
     expense = Expense.query.filter_by(id=expense_id, user_id=current_user.id).first_or_404()
     if request.method == 'POST':
-        amount = _validate_amount(request.form.get('amount', expense.amount))
+        amount = validate_amount(request.form.get('amount', expense.amount))
         if amount is None:
             flash('Invalid amount.')
             return redirect(url_for('main.edit_expense', expense_id=expense_id))
 
-        expense.date = request.form.get('date', expense.date)
-        expense.merchant = request.form.get('merchant', expense.merchant)[:100]
+        date_str = validate_date(request.form.get('date', expense.date))
+        if date_str is None:
+            flash('Invalid date format.')
+            return redirect(url_for('main.edit_expense', expense_id=expense_id))
+
+        expense.date = date_str
+        expense.merchant = sanitize_string(request.form.get('merchant', expense.merchant), max_length=100)
         expense.amount = amount
-        expense.category = _validate_category(request.form.get('category', expense.category))
-        expense.payment_type = request.form.get('payment_type', expense.payment_type)
+        expense.category = validate_category(request.form.get('category', expense.category))
+        expense.payment_type = validate_payment_type(request.form.get('payment_type', expense.payment_type))
         db.session.commit()
         return redirect(url_for('main.index'))
     return render_template('edit_manual.html', expense=expense)
@@ -260,6 +278,7 @@ def settle_split(split_id):
 
 @main_bp.route('/export_csv')
 @login_required
+@limiter.limit("10 per minute")
 def export_csv():
     expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date.desc()).all()
     si = StringIO()
@@ -272,4 +291,55 @@ def export_csv():
         output,
         mimetype="text/csv",
         headers={"Content-Disposition": "attachment;filename=expenses_export.csv"}
+    )
+
+
+@main_bp.route('/export_pdf')
+@login_required
+@limiter.limit("10 per minute")
+def export_pdf():
+    expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date.desc()).all()
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font('Helvetica', 'B', 16)
+    pdf.cell(0, 10, 'Expense Report', new_x='LMARGIN', new_y='NEXT', align='C')
+    pdf.set_font('Helvetica', '', 10)
+    pdf.cell(0, 8, f'Generated: {datetime.today().strftime("%Y-%m-%d")}  |  User: {current_user.name or current_user.username}', new_x='LMARGIN', new_y='NEXT', align='C')
+    pdf.ln(5)
+
+    # Table header
+    pdf.set_font('Helvetica', 'B', 9)
+    col_widths = [25, 50, 30, 35, 30]
+    headers = ['Date', 'Merchant', 'Amount', 'Category', 'Payment']
+    for i, header in enumerate(headers):
+        pdf.cell(col_widths[i], 8, header, border=1, align='C')
+    pdf.ln()
+
+    # Table rows
+    pdf.set_font('Helvetica', '', 8)
+    total = 0.0
+    for e in expenses:
+        amt = float(e.amount) if e.amount else 0.0
+        total += amt
+        pdf.cell(col_widths[0], 7, str(e.date or ''), border=1)
+        pdf.cell(col_widths[1], 7, str(e.merchant or '')[:30], border=1)
+        pdf.cell(col_widths[2], 7, f'{amt:.2f}', border=1, align='R')
+        pdf.cell(col_widths[3], 7, str(e.category or ''), border=1, align='C')
+        pdf.cell(col_widths[4], 7, str(e.payment_type or ''), border=1, align='C')
+        pdf.ln()
+
+    # Total row
+    pdf.set_font('Helvetica', 'B', 9)
+    pdf.cell(col_widths[0] + col_widths[1], 8, 'TOTAL', border=1, align='R')
+    pdf.cell(col_widths[2], 8, f'{total:.2f}', border=1, align='R')
+    pdf.cell(col_widths[3] + col_widths[4], 8, '', border=1)
+
+    buf = BytesIO()
+    pdf.output(buf)
+    buf.seek(0)
+    return Response(
+        buf.getvalue(),
+        mimetype="application/pdf",
+        headers={"Content-Disposition": "attachment;filename=expenses_export.pdf"}
     )

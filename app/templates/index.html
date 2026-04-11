@@ -47,8 +47,8 @@ content %}
       <span class="text-text-muted font-mono text-sm opacity-50">₹</span>
       <span
         class="font-mono text-4xl font-bold tabular-nums tracking-tight group-hover:text-accent-cyan transition-colors">
-        {{ "%.2f"|format(current_user.monthly_target) if
-        current_user.monthly_target else "0.00" }}
+        {{ "%.2f"|format(monthly_target_float) if
+        monthly_target_float else "0.00" }}
       </span>
     </div>
     <!-- LED Accent -->
@@ -72,8 +72,8 @@ content %}
       >
     </div>
     <div class="flex items-baseline gap-2">
-      {% set remaining = (current_user.monthly_target - monthly_total) if
-      current_user.monthly_target else 0 %}
+      {% set remaining = (monthly_target_float - monthly_total) if
+      monthly_target_float else 0 %}
       <span
         class="{% if remaining < 0 %}text-primary{% else %}text-accent-cyan{% endif %} font-mono text-sm opacity-50"
         >₹</span
@@ -100,6 +100,22 @@ content %}
     background-color: #00e5ff;
   }
 </style>
+
+<!-- Budget Alerts -->
+{% if budget_alerts %}
+<section class="flex flex-col gap-3">
+  {% for alert in budget_alerts %}
+  <div class="{% if alert.level == 'critical' %}bg-primary/10 border-primary/30{% elif alert.level == 'warning' %}bg-yellow-500/10 border-yellow-500/30{% else %}bg-accent-cyan/10 border-accent-cyan/30{% endif %} border p-4 rounded-sm flex items-center gap-4 relative overflow-hidden">
+    <div class="w-8 h-8 rounded-sm machined-plate flex items-center justify-center shrink-0">
+      <span class="material-symbols-outlined {% if alert.level == 'critical' %}text-primary led-active{% elif alert.level == 'warning' %}text-yellow-500{% else %}text-accent-cyan{% endif %} text-[18px]">
+        {% if alert.level == 'critical' %}error{% elif alert.level == 'warning' %}warning{% else %}info{% endif %}
+      </span>
+    </div>
+    <p class="text-[11px] font-mono text-text-main uppercase tracking-wider">{{ alert.message }}</p>
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
 
 <!-- Alerts & Health -->
 <section class="flex flex-col gap-4">
@@ -142,8 +158,8 @@ content %}
       class="text-[10px] font-mono text-text-muted uppercase tracking-widest sm:ml-auto"
       >Efficiency:
       <span class="text-accent-cyan"
-        >{{ ((remaining / current_user.monthly_target * 100) if
-        current_user.monthly_target and current_user.monthly_target > 0 else
+        >{{ ((remaining / monthly_target_float * 100) if
+        monthly_target_float and monthly_target_float > 0 else
         100)|round(1) }}%</span
       ></span
     >
@@ -212,6 +228,12 @@ content %}
         class="text-[10px] font-mono text-text-muted hover:text-white uppercase tracking-wider transition-colors flex items-center gap-2 group border border-white/10 px-3 py-1.5 bg-surface-inset rounded-sm">
         <span class="material-symbols-outlined text-[14px]">download</span>
         <span class="hidden sm:inline">Export_CSV</span>
+      </a>
+      <a
+        href="{{ url_for('main.export_pdf') }}"
+        class="text-[10px] font-mono text-text-muted hover:text-white uppercase tracking-wider transition-colors flex items-center gap-2 group border border-white/10 px-3 py-1.5 bg-surface-inset rounded-sm">
+        <span class="material-symbols-outlined text-[14px]">picture_as_pdf</span>
+        <span class="hidden sm:inline">Export_PDF</span>
       </a>
       <a
         class="text-[10px] font-mono text-text-muted hover:text-accent-cyan uppercase tracking-wider transition-colors flex items-center gap-2 group ml-2"

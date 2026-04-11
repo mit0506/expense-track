@@ -52,6 +52,7 @@ class Subscription(db.Model):
     billing_cycle = db.Column(db.String(20), default='monthly')
     next_billing_date = db.Column(db.String(20), nullable=False)
     auto_log = db.Column(db.Boolean, default=True)
+    last_processed = db.Column(db.String(20), nullable=True)
 
 class BillSplit(db.Model):
     id = db.Column(db.Integer, primary_key=True)

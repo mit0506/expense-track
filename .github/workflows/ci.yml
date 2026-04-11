@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install linting tools
+        run: pip install flake8
+
+      - name: Run flake8
+        run: flake8 app/ tests/ --max-line-length 120 --exclude __pycache__
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "sqlite://"
+      SECRET_KEY: "ci-test-secret-key"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run tests
+        run: pytest tests/ -v --tb=short
