@@ -125,10 +125,14 @@
         // User Message
         const userContainer = document.createElement('div');
         userContainer.className = 'flex gap-3';
-        userContainer.innerHTML = `
-            <span class="text-accent-cyan font-bold">USER_OPS >></span>
-            <span class="text-text-main">${question}</span>
-        `;
+        const userLabel = document.createElement('span');
+        userLabel.className = 'text-accent-cyan font-bold';
+        userLabel.textContent = 'USER_OPS >>';
+        const userText = document.createElement('span');
+        userText.className = 'text-text-main';
+        userText.textContent = question;
+        userContainer.appendChild(userLabel);
+        userContainer.appendChild(userText);
         box.appendChild(userContainer);
         input.value = '';
         box.scrollTop = box.scrollHeight;
@@ -142,7 +146,7 @@
         
         fetch('/chat', {
             method: 'POST',
-            headers: {'Content-Type':'application/json'},
+            headers: {'Content-Type':'application/json', 'X-CSRFToken': '{{ csrf_token() }}'},
             body: JSON.stringify({question: question})
         })
         .then(res=>res.json())
@@ -150,10 +154,14 @@
             document.getElementById('thinking-indicator').remove();
             const botContainer = document.createElement('div');
             botContainer.className = 'flex gap-3';
-            botContainer.innerHTML = `
-                <span class="text-primary font-bold">ASSISTANT_BOT >></span>
-                <span class="text-text-muted">${data.answer}</span>
-            `;
+            const botLabel = document.createElement('span');
+            botLabel.className = 'text-primary font-bold';
+            botLabel.textContent = 'ASSISTANT_BOT >>';
+            const botText = document.createElement('span');
+            botText.className = 'text-text-muted';
+            botText.textContent = data.answer;
+            botContainer.appendChild(botLabel);
+            botContainer.appendChild(botText);
             box.appendChild(botContainer);
             box.scrollTop = box.scrollHeight;
         })
@@ -161,10 +169,13 @@
             document.getElementById('thinking-indicator').remove();
             const botContainer = document.createElement('div');
             botContainer.className = 'flex gap-3 text-primary';
-            botContainer.innerHTML = `
-                <span class="font-bold">SYSTEM_ERROR >></span>
-                <span>CRITICAL FAIL IN NEURAL PROCESSING.</span>
-            `;
+            const errLabel = document.createElement('span');
+            errLabel.className = 'font-bold';
+            errLabel.textContent = 'SYSTEM_ERROR >>';
+            const errText = document.createElement('span');
+            errText.textContent = 'CRITICAL FAIL IN NEURAL PROCESSING.';
+            botContainer.appendChild(errLabel);
+            botContainer.appendChild(errText);
             box.appendChild(botContainer);
         });
     }

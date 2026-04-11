@@ -23,6 +23,7 @@ block content %}
       method="POST"
       enctype="multipart/form-data"
       class="flex flex-col gap-8">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <!-- Profile Identity -->
       <div class="flex flex-col md:flex-row gap-8 items-center md:items-start">
         <div class="flex flex-col items-center gap-3">
