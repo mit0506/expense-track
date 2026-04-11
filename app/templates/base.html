@@ -118,6 +118,18 @@
             </header>
 
             <div class="p-4 lg:p-8 flex flex-col gap-6 lg:gap-8 max-w-[1200px] mx-auto w-full">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <div class="flex flex-col gap-2">
+                    {% for message in messages %}
+                    <div class="bg-primary/10 border border-primary/30 p-4 rounded-sm flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary text-[18px]">info</span>
+                        <p class="text-[11px] font-mono text-text-main uppercase tracking-wider">{{ message }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
                 {% block content %}{% endblock %}
             </div>
         </main>
@@ -163,14 +175,14 @@
                             <span class="material-symbols-outlined text-[14px] text-text-muted">data_usage</span>
                         </div>
                         <div class="font-mono text-sm text-text-main tabular-nums">
-                            {% if current_user.monthly_target %}
-                                ₹{{ '%.2f'|format(monthly_total) }} / ₹{{ '%.2f'|format(current_user.monthly_target) }}
+                            {% if monthly_target_float %}
+                                ₹{{ '%.2f'|format(monthly_total) }} / ₹{{ '%.2f'|format(monthly_target_float) }}
                             {% else %}
                                 ₹{{ '%.2f'|format(monthly_total) }}
                             {% endif %}
                         </div>
                         <div class="w-full h-1 bg-surface mt-2 rounded-full overflow-hidden border border-white/5">
-                            {% set percent = (monthly_total / current_user.monthly_target * 100) if current_user.monthly_target and current_user.monthly_target > 0 else 0 %}
+                            {% set percent = (monthly_total / monthly_target_float * 100) if monthly_target_float and monthly_target_float > 0 else 0 %}
                             {% set display_width = percent if percent <= 100 else 100 %}
                             <div class="h-full {% if percent > 100 %}bg-primary{% else %}bg-accent-cyan{% endif %}" style="width: {{ display_width }}%"></div>
                         </div>
