@@ -156,7 +156,8 @@ def chat():
                 return jsonify({'answer': res.choices[0].message['content'].strip()})
             else:
                 client = getattr(openai, 'OpenAI', None)(api_key=openai.api_key)
-                res = client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": user_prompt}])
+                msgs = [{"role": "user", "content": user_prompt}]
+                res = client.chat.completions.create(model="gpt-3.5-turbo", messages=msgs)
                 return jsonify({'answer': res.choices[0].message.content.strip()})
         except Exception as e:
             logger.error("OpenAI API error: %s", e)

@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from app.models import db, UserProfile, CategoryBudget
 from app.constants import EXPENSE_CATEGORIES, ALLOWED_AVATAR_EXTENSIONS
-from app.validators import validate_username, validate_password, sanitize_string, validate_amount
+from app.validators import validate_username, validate_password, sanitize_string
 from app.routes import main_bp
 from app import limiter
 
@@ -133,5 +133,6 @@ def profile():
         db.session.commit()
         return redirect(url_for('main.index'))
 
-    category_budgets = {b.category: float(b.amount) for b in CategoryBudget.query.filter_by(user_id=current_user.id).all()}
+    budgets = CategoryBudget.query.filter_by(user_id=current_user.id).all()
+    category_budgets = {b.category: float(b.amount) for b in budgets}
     return render_template('profile.html', profile=current_user, category_budgets=category_budgets)

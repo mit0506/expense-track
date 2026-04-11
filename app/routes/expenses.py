@@ -181,7 +181,8 @@ def upload_receipt():
             error = "Please select a file to upload"
         else:
             filename = secure_filename(file.filename)
-            if not filename or not ('.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_RECEIPT_EXTENSIONS):
+            ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+            if not filename or ext not in ALLOWED_RECEIPT_EXTENSIONS:
                 error = "Invalid file type. Please upload an image file."
             else:
                 upload_folder = current_app.config['UPLOAD_FOLDER']
@@ -269,7 +270,8 @@ def split_expense(expense_id):
 @login_required
 def settle_split(split_id):
     split = BillSplit.query.filter(
-        (BillSplit.id == split_id) & ((BillSplit.payer_id == current_user.id) | (BillSplit.debtor_id == current_user.id))
+        (BillSplit.id == split_id)
+        & ((BillSplit.payer_id == current_user.id) | (BillSplit.debtor_id == current_user.id))
     ).first_or_404()
     split.settled = True
     db.session.commit()
@@ -305,7 +307,12 @@ def export_pdf():
     pdf.set_font('Helvetica', 'B', 16)
     pdf.cell(0, 10, 'Expense Report', new_x='LMARGIN', new_y='NEXT', align='C')
     pdf.set_font('Helvetica', '', 10)
-    pdf.cell(0, 8, f'Generated: {datetime.today().strftime("%Y-%m-%d")}  |  User: {current_user.name or current_user.username}', new_x='LMARGIN', new_y='NEXT', align='C')
+    gen_date = datetime.today().strftime("%Y-%m-%d")
+    user_name = current_user.name or current_user.username
+    pdf.cell(
+        0, 8, f'Generated: {gen_date}  |  User: {user_name}',
+        new_x='LMARGIN', new_y='NEXT', align='C'
+    )
     pdf.ln(5)
 
     # Table header
