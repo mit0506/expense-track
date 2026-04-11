@@ -92,16 +92,16 @@ def test_delete_other_users_expense(auth_client, app):
     """Cannot delete another user's expense."""
     from werkzeug.security import generate_password_hash
     from app.models import UserProfile
-    with app.app_context():
-        other = UserProfile(username='other', password_hash=generate_password_hash('pass123'))
-        db.session.add(other)
-        db.session.flush()
-        exp = Expense(user_id=other.id, date='2026-04-01', merchant='NotYours', amount=100)
-        db.session.add(exp)
-        db.session.commit()
+    other = UserProfile(username='other', password_hash=generate_password_hash('pass123'))
+    db.session.add(other)
+    db.session.flush()
+    exp = Expense(user_id=other.id, date='2026-04-01', merchant='NotYours', amount=100)
+    db.session.add(exp)
+    db.session.commit()
+    exp_id = exp.id
 
-        resp = auth_client.post(f'/delete/{exp.id}')
-        assert resp.status_code == 404
+    resp = auth_client.post(f'/delete/{exp_id}')
+    assert resp.status_code == 404
 
 
 def test_export_csv(auth_client):

@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask
+from flask import Flask, jsonify, render_template, request, redirect, flash
 from app.models import db, UserProfile
 from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
@@ -11,7 +11,7 @@ from flask_login import LoginManager
 
 load_dotenv()
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 login_manager = LoginManager()
@@ -67,6 +67,27 @@ def create_app():
     # Register blueprints
     from app.routes import main_bp
     app.register_blueprint(main_bp)
+
+    # Error handlers
+    @app.errorhandler(404)
+    def not_found(e):
+        if request.path.startswith('/api/'):
+            return jsonify({'error': 'Not found'}), 404
+        return render_template('errors/404.html'), 404
+
+    @app.errorhandler(429)
+    def rate_limited(e):
+        if request.path.startswith('/api/'):
+            return jsonify({'error': 'Rate limit exceeded. Please try again later.'}), 429
+        flash('Too many requests. Please slow down.')
+        return redirect(request.referrer or '/')
+
+    @app.errorhandler(500)
+    def server_error(e):
+        logger.error("Internal server error: %s", e)
+        if request.path.startswith('/api/'):
+            return jsonify({'error': 'Internal server error'}), 500
+        return render_template('errors/500.html'), 500
 
     with app.app_context():
         db.create_all()
