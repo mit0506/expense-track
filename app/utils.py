@@ -1,7 +1,7 @@
 import re
 from datetime import datetime, timedelta
 from flask import current_app
-from app.models import Expense, UserProfile
+from app.models import Expense
 from app.constants import CATEGORY_KEYWORDS
 
 
@@ -169,7 +169,10 @@ def generate_insights(user_id):
     monthly_inc = float(current_app.config.get('MONTHLY_INCOME', 50000.0))
     if total_spending > (monthly_inc * 0.8):
         overall_perc = (total_spending / monthly_inc) * 100.0
-        warnings.append(f"You've spent ₹{total_spending:.0f} which is {overall_perc:.1f}% of your monthly income of ₹{monthly_inc}.")
+        warnings.append(
+            f"You've spent ₹{total_spending:.0f} which is {overall_perc:.1f}%"
+            f" of your monthly income of ₹{monthly_inc}."
+        )
 
     for category, amount in sorted_categories:
         if float(amount) > (monthly_inc * 0.3):
@@ -190,7 +193,10 @@ def generate_insights(user_id):
 
     potential_savings = sum(float(amt) * 0.1 for _, amt in sorted_categories[:2])
     if potential_savings > 0.0:
-        recommendations.append(f"Reducing spending by 10% on your top categories could save you ₹{potential_savings:.0f} monthly.")
+        recommendations.append(
+            f"Reducing spending by 10% on your top categories"
+            f" could save you ₹{potential_savings:.0f} monthly."
+        )
 
     return {
         'total_spending': total_spending,
