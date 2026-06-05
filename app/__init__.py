@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 login_manager = LoginManager()
-login_manager.login_view = 'main.login'
+login_manager.login_view = 'main.login'  # type: ignore[assignment]
 
 csrf = CSRFProtect()
 limiter = Limiter(key_func=get_remote_address, default_limits=["200 per minute"])
