@@ -11,3 +11,4 @@ Flask-Migrate
 Werkzeug
 Flask-Bcrypt
 fpdf2
+gunicorn

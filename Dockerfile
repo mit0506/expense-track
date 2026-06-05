@@ -46,7 +46,7 @@ COPY --from=node-builder /build/app/static/css/style.css ./app/static/css/style.
 RUN mkdir -p uploads
 
 # Expose the port the app runs on
-EXPOSE 5000
+EXPOSE 5173
 
-# Command to run the application
-CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=5000"]
+# Command to run the application using Gunicorn
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5173", "run:app"]

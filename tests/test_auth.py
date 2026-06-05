@@ -57,3 +57,20 @@ def test_protected_route_redirects_to_login(client):
     resp = client.get('/')
     assert resp.status_code == 302
     assert '/login' in resp.headers['Location']
+
+def test_profile_update(auth_client):
+    resp = auth_client.post('/profile', data={
+        'name': 'Updated Name',
+        'monthly_income': '60000',
+        'monthly_target': '5000',
+        'budget_Food': '1000'
+    }, follow_redirects=True)
+    assert resp.status_code == 200
+    user = UserProfile.query.filter_by(username='testuser').first()
+    assert user is not None
+    assert user.name == 'Updated Name'
+    assert float(user.monthly_income) == 60000.0
+    from app.models import CategoryBudget
+    budget = CategoryBudget.query.filter_by(user_id=user.id, category='Food').first()
+    assert budget is not None
+    assert float(budget.amount) == 1000.0
