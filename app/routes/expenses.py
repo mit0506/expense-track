@@ -1,7 +1,7 @@
 import os
 import csv
 import logging
-from io import StringIO, BytesIO
+from io import StringIO
 from datetime import datetime
 from flask import render_template, request, redirect, url_for, current_app, flash, Response
 from fpdf import FPDF
@@ -282,7 +282,11 @@ def settle_split(split_id):
 @login_required
 @limiter.limit("10 per minute")
 def export_csv():
-    expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date.desc()).all()  # type: ignore[attr-defined]
+    expenses = (
+        Expense.query.filter_by(user_id=current_user.id)
+        .order_by(Expense.date.desc())  # type: ignore[attr-defined]
+        .all()
+    )
     si = StringIO()
     cw = csv.writer(si)
     cw.writerow(['ID', 'Date', 'Merchant', 'Amount', 'Category', 'Payment_Type'])
@@ -300,7 +304,11 @@ def export_csv():
 @login_required
 @limiter.limit("10 per minute")
 def export_pdf():
-    expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date.desc()).all()  # type: ignore[attr-defined]
+    expenses = (
+        Expense.query.filter_by(user_id=current_user.id)
+        .order_by(Expense.date.desc())  # type: ignore[attr-defined]
+        .all()
+    )
 
     pdf = FPDF()
     pdf.add_page()
