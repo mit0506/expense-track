@@ -1,19 +1,24 @@
 from __future__ import annotations
+from typing import Optional, List
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from sqlalchemy import Numeric
+from sqlalchemy import Numeric, String, Integer, ForeignKey, Boolean, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 db = SQLAlchemy()
 
 
 class Expense(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user_profile.id'), nullable=False, index=True)
-    date = db.Column(db.String(10), index=True)
-    merchant = db.Column(db.String(100))
-    amount = db.Column(Numeric(10, 2))
-    category = db.Column(db.String(50))
-    payment_type = db.Column(db.String(50))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('user_profile.id'), index=True)
+    date: Mapped[Optional[str]] = mapped_column(String(10), index=True)
+    merchant: Mapped[Optional[str]] = mapped_column(String(100))
+    amount: Mapped[Optional[float]] = mapped_column(Numeric(10, 2))
+    category: Mapped[Optional[str]] = mapped_column(String(50))
+    payment_type: Mapped[Optional[str]] = mapped_column(String(50))
+
+    user: Mapped["UserProfile"] = relationship(back_populates="expenses")
 
     def to_dict(self):
         return {
@@ -39,11 +44,15 @@ class Expense(db.Model):
 
 
 class CategoryBudget(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user_profile.id'), nullable=False, index=True)
-    category = db.Column(db.String(50), nullable=False)
-    amount = db.Column(Numeric(10, 2), default=0.0)
-    __table_args__ = (db.UniqueConstraint('user_id', 'category', name='_user_category_uc'),)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('user_profile.id'), index=True)
+    category: Mapped[str] = mapped_column(String(50))
+    amount: Mapped[Optional[float]] = mapped_column(
+        Numeric(10, 2), default=0.0)
+
+    __table_args__ = (UniqueConstraint(
+        'user_id', 'category', name='_user_category_uc'),)
 
     def to_dict(self):
         return {'category': self.category, 'amount': float(self.amount) if self.amount else 0.0}
@@ -55,15 +64,17 @@ class CategoryBudget(db.Model):
 
 
 class Subscription(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user_profile.id'), nullable=False, index=True)
-    merchant = db.Column(db.String(100), nullable=False)
-    amount = db.Column(Numeric(10, 2), nullable=False)
-    category = db.Column(db.String(50))
-    billing_cycle = db.Column(db.String(20), default='monthly')
-    next_billing_date = db.Column(db.String(20), nullable=False)
-    auto_log = db.Column(db.Boolean, default=True)
-    last_processed = db.Column(db.String(20), nullable=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('user_profile.id'), index=True)
+    merchant: Mapped[str] = mapped_column(String(100))
+    amount: Mapped[float] = mapped_column(Numeric(10, 2))
+    category: Mapped[Optional[str]] = mapped_column(String(50))
+    billing_cycle: Mapped[Optional[str]] = mapped_column(
+        String(20), default='monthly')
+    next_billing_date: Mapped[str] = mapped_column(String(20))
+    auto_log: Mapped[Optional[bool]] = mapped_column(Boolean, default=True)
+    last_processed: Mapped[Optional[str]] = mapped_column(String(20))
 
     def __init__(
         self, user_id, merchant, amount, category=None,
@@ -81,12 +92,15 @@ class Subscription(db.Model):
 
 
 class BillSplit(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    expense_id = db.Column(db.Integer, db.ForeignKey('expense.id'), nullable=False, index=True)
-    payer_id = db.Column(db.Integer, db.ForeignKey('user_profile.id'), nullable=False, index=True)
-    debtor_id = db.Column(db.Integer, db.ForeignKey('user_profile.id'), nullable=False, index=True)
-    amount = db.Column(Numeric(10, 2), nullable=False)
-    settled = db.Column(db.Boolean, default=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    expense_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('expense.id'), index=True)
+    payer_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('user_profile.id'), index=True)
+    debtor_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('user_profile.id'), index=True)
+    amount: Mapped[float] = mapped_column(Numeric(10, 2))
+    settled: Mapped[Optional[bool]] = mapped_column(Boolean, default=False)
 
     def __init__(self, expense_id, payer_id, debtor_id, amount, settled=False):
         self.expense_id = expense_id
@@ -97,14 +111,18 @@ class BillSplit(db.Model):
 
 
 class UserProfile(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), unique=True, nullable=False, index=True)
-    password_hash = db.Column(db.String(255), nullable=False)
-    name = db.Column(db.String(100), default='User')
-    monthly_income = db.Column(Numeric(10, 2), default=0.0)
-    monthly_target = db.Column(Numeric(10, 2), default=0.0)
-    avatar = db.Column(db.String(200), nullable=True)
-    expenses = db.relationship('Expense', backref='user', lazy=True, cascade='all, delete-orphan')
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    username: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(255))
+    name: Mapped[Optional[str]] = mapped_column(String(100), default='User')
+    monthly_income: Mapped[Optional[float]] = mapped_column(
+        Numeric(10, 2), default=0.0)
+    monthly_target: Mapped[Optional[float]] = mapped_column(
+        Numeric(10, 2), default=0.0)
+    avatar: Mapped[Optional[str]] = mapped_column(String(200))
+
+    expenses: Mapped[List["Expense"]] = relationship(
+        back_populates="user", cascade='all, delete-orphan')
 
     def to_dict(self):
         return {
