@@ -100,11 +100,11 @@ def create_app():
         target = request.referrer
         if not target:
             return redirect('/')
-            
+
         from urllib.parse import urlparse, urljoin
         ref_url = urlparse(request.host_url)
         test_url = urlparse(urljoin(request.host_url, target))
-        
+
         if test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc:
             return redirect(target)
         return redirect('/')
