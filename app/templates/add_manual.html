@@ -23,7 +23,7 @@
                     <span class="text-primary font-mono text-2xl mr-4 group-focus-within:text-accent-cyan transition-colors">₹</span>
                     <input type="number" step="0.01" name="amount" id="amount" required 
                            class="bg-transparent border-none text-4xl font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0 tabular-nums" 
-                           placeholder="0.00">
+                           placeholder="0.00" value="{{ request.args.get('amount', '') }}">
                 </div>
             </div>
 
@@ -35,7 +35,7 @@
                     <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
                         <input type="text" name="merchant" required 
                                class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0" 
-                               placeholder="ACME_CORP_...">
+                               placeholder="ACME_CORP_..." value="{{ request.args.get('merchant', '') }}">
                     </div>
                 </div>
 
@@ -44,7 +44,8 @@
                     <label class="text-[10px] font-mono text-text-muted uppercase tracking-widest px-1">Sequence Date</label>
                     <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5">
                         <input type="date" name="date" required 
-                               class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0 [color-scheme:dark]">
+                               class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0 [color-scheme:dark]"
+                               value="{{ request.args.get('date', '') }}">
                     </div>
                 </div>
 
@@ -54,12 +55,12 @@
                     <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5 cursor-pointer">
                         <select name="category" required 
                                 class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0 appearance-none cursor-pointer">
-                            <option value="Food" class="bg-surface text-text-main">FOOD // CATERING</option>
-                            <option value="Transport" class="bg-surface text-text-main">TRANSIT // LOGISTICS</option>
-                            <option value="Shopping" class="bg-surface text-text-main">ASSETS // PROCUREMENT</option>
-                            <option value="Utilities" class="bg-surface text-text-main">UTILITIES // OPS</option>
-                            <option value="Entertainment" class="bg-surface text-text-main">ENT // RECREATION</option>
-                            <option value="Miscellaneous" class="bg-surface text-text-main" selected>MISC // UNCATEGORIZED</option>
+                            <option value="Food" class="bg-surface text-text-main" {% if request.args.get('category') == 'Food' %}selected{% endif %}>FOOD // CATERING</option>
+                            <option value="Transport" class="bg-surface text-text-main" {% if request.args.get('category') == 'Transport' %}selected{% endif %}>TRANSIT // LOGISTICS</option>
+                            <option value="Shopping" class="bg-surface text-text-main" {% if request.args.get('category') == 'Shopping' %}selected{% endif %}>ASSETS // PROCUREMENT</option>
+                            <option value="Utilities" class="bg-surface text-text-main" {% if request.args.get('category') == 'Utilities' %}selected{% endif %}>UTILITIES // OPS</option>
+                            <option value="Entertainment" class="bg-surface text-text-main" {% if request.args.get('category') == 'Entertainment' %}selected{% endif %}>ENT // RECREATION</option>
+                            <option value="Miscellaneous" class="bg-surface text-text-main" {% if not request.args.get('category') or request.args.get('category') == 'Miscellaneous' %}selected{% endif %}>MISC // UNCATEGORIZED</option>
                         </select>
                         <span class="material-symbols-outlined text-text-muted text-[18px]">keyboard_arrow_down</span>
                     </div>
@@ -71,10 +72,10 @@
                     <div class="machined-inset h-12 rounded-sm flex items-center px-4 border border-white/5 cursor-pointer">
                         <select name="payment_type" required 
                                 class="bg-transparent border-none text-xs font-mono text-text-main w-full focus:outline-none focus:ring-0 p-0 appearance-none cursor-pointer">
-                            <option value="Cash" class="bg-surface text-text-main">PHY // CASH</option>
-                            <option value="Card" class="bg-surface text-text-main">NET // CARD</option>
-                            <option value="UPI" class="bg-surface text-text-main" selected>VIRT // UPI</option>
-                            <option value="Net Banking" class="bg-surface text-text-main">NET // BANKING</option>
+                            <option value="Cash" class="bg-surface text-text-main" {% if request.args.get('payment_type') == 'Cash' %}selected{% endif %}>PHY // CASH</option>
+                            <option value="Card" class="bg-surface text-text-main" {% if request.args.get('payment_type') == 'Card' %}selected{% endif %}>NET // CARD</option>
+                            <option value="UPI" class="bg-surface text-text-main" {% if not request.args.get('payment_type') or request.args.get('payment_type') == 'UPI' %}selected{% endif %}>VIRT // UPI</option>
+                            <option value="Net Banking" class="bg-surface text-text-main" {% if request.args.get('payment_type') == 'Net Banking' %}selected{% endif %}>NET // BANKING</option>
                         </select>
                         <span class="material-symbols-outlined text-text-muted text-[18px]">keyboard_arrow_down</span>
                     </div>
@@ -94,7 +95,10 @@
 </div>
 
 <script>
-    // Set default date to today
-    document.querySelector('input[type="date"]').valueAsDate = new Date();
+    // Set default date to today if not provided via OCR
+    const dateInput = document.querySelector('input[type="date"]');
+    if (!dateInput.value) {
+        dateInput.valueAsDate = new Date();
+    }
 </script>
 {% endblock %}
