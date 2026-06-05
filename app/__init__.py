@@ -18,7 +18,8 @@ login_manager = LoginManager()
 login_manager.login_view = 'main.login'  # type: ignore[assignment]
 
 csrf = CSRFProtect()
-limiter = Limiter(key_func=get_remote_address, default_limits=["200 per minute"])
+limiter = Limiter(key_func=get_remote_address,
+                  default_limits=["200 per minute"])
 migrate = Migrate()
 
 
@@ -30,10 +31,12 @@ def create_app():
     secret_key = os.environ.get('SECRET_KEY')
     if not secret_key:
         if os.environ.get('FLASK_ENV') == 'production':
-            raise RuntimeError("SECRET_KEY environment variable must be set in production")
+            raise RuntimeError(
+                "SECRET_KEY environment variable must be set in production")
         secret_key = 'dev_default_key_123'
     app.config['SECRET_KEY'] = secret_key
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///expenses.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+        'DATABASE_URL', 'sqlite:///expenses.db')
     app.config['UPLOAD_FOLDER'] = 'uploads'
     app.config['MONTHLY_INCOME'] = 50000
 
@@ -58,9 +61,11 @@ def create_app():
     try:
         import pytesseract
         if os.path.exists(r'C:\Program Files\Tesseract-OCR\tesseract.exe'):
-            setattr(pytesseract, 'pytesseract_cmd', r'C:\Program Files\Tesseract-OCR\tesseract.exe')
+            setattr(pytesseract, 'pytesseract_cmd',
+                    r'C:\Program Files\Tesseract-OCR\tesseract.exe')
         elif os.path.exists(r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'):
-            setattr(pytesseract, 'pytesseract_cmd', r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe')
+            setattr(pytesseract, 'pytesseract_cmd',
+                    r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe')
     except ImportError:
         pass
 
@@ -80,7 +85,21 @@ def create_app():
         if request.path.startswith('/api/'):
             return jsonify({'error': 'Rate limit exceeded. Please try again later.'}), 429
         flash('Too many requests. Please slow down.')
+<<<<<<< Updated upstream
         return redirect(request.referrer or '/')
+=======
+        target = request.referrer
+        if not target:
+            return redirect('/')
+
+        from urllib.parse import urlparse, urljoin
+        ref_url = urlparse(request.host_url)
+        test_url = urlparse(urljoin(request.host_url, target))
+
+        if test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc:
+            return redirect(target)
+        return redirect('/')
+>>>>>>> Stashed changes
 
     @app.errorhandler(500)
     def server_error(e):
