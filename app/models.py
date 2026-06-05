@@ -65,7 +65,11 @@ class Subscription(db.Model):
     auto_log = db.Column(db.Boolean, default=True)
     last_processed = db.Column(db.String(20), nullable=True)
 
-    def __init__(self, user_id, merchant, amount, category=None, billing_cycle='monthly', next_billing_date='', auto_log=True, last_processed=None):
+    def __init__(
+        self, user_id, merchant, amount, category=None,
+        billing_cycle='monthly', next_billing_date='',
+        auto_log=True, last_processed=None
+    ):
         self.user_id = user_id
         self.merchant = merchant
         self.amount = amount
