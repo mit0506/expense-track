@@ -41,7 +41,19 @@ def subscriptions():
         db.session.commit()
         return redirect(url_for('main.subscriptions'))
 
+    from datetime import datetime
     subs = Subscription.query.filter_by(user_id=current_user.id).order_by(Subscription.next_billing_date).all()
+    today = datetime.today().date()
+    for sub in subs:
+        if sub.next_billing_date:
+            try:
+                next_date = datetime.strptime(sub.next_billing_date, '%Y-%m-%d').date()
+                sub.days_until = (next_date - today).days
+            except ValueError:
+                sub.days_until = 999
+        else:
+            sub.days_until = 999
+            
     return render_template('subscriptions.html', subscriptions=subs)
 
 
