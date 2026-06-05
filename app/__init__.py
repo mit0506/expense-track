@@ -52,10 +52,14 @@ def create_app():
 
     # optional AI chatbot integration
     try:
-        import openai  # type: ignore[import]
-        openai.api_key = os.environ.get('OPENAI_API_KEY', '')
+        from openai import OpenAI
+        api_key = os.environ.get('OPENAI_API_KEY')
+        if api_key:
+            app.config['OPENAI_CLIENT'] = OpenAI(api_key=api_key)
+        else:
+            app.config['OPENAI_CLIENT'] = None
     except ImportError:
-        pass
+        app.config['OPENAI_CLIENT'] = None
 
     # Try to set Tesseract path if it exists in common Windows locations
     try:
