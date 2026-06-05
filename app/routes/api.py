@@ -24,6 +24,13 @@ def insights():
     return render_template('insights.html', insights=generate_insights(current_user.id))
 
 
+@main_bp.route('/chatbot')
+@login_required
+def chatbot():
+    from flask import render_template
+    return render_template('chat.html')
+
+
 @main_bp.route('/visualize')
 @login_required
 def visualize():
@@ -72,7 +79,8 @@ def _filter_expenses_by_period(user_id, period):
         elif period == 'monthly':
             match = ed.year == now.year and ed.month == now.month
         elif period == 'quarterly':
-            match = ed.year == now.year and ((now.month - 1) // 3 == (ed.month - 1) // 3)
+            match = ed.year == now.year and (
+                (now.month - 1) // 3 == (ed.month - 1) // 3)
         elif period == 'annually':
             match = ed.year == now.year
 
@@ -85,8 +93,10 @@ def _build_visualization_response(filtered):
     cat_totals: dict[str, float] = {}
     date_totals: dict[str, float] = {}
     for e in filtered:
-        cat_totals[e['category']] = cat_totals.get(e['category'], 0) + float(e['amount'])
-        date_totals[e['date']] = date_totals.get(e['date'], 0) + float(e['amount'])
+        cat_totals[e['category']] = cat_totals.get(
+            e['category'], 0) + float(e['amount'])
+        date_totals[e['date']] = date_totals.get(
+            e['date'], 0) + float(e['amount'])
 
     sd = sorted(date_totals.keys())
     return {
@@ -137,42 +147,60 @@ def get_custom_visualization():
 @login_required
 @limiter.limit("10 per minute")
 def chat():
+    from flask import current_app
     data = request.get_json(silent=True) or {}
-    q = str(data.get('question', ''))[:500].lower()
-    if not q.strip():
+    q = str(data.get('question', ''))[:500].strip()
+    if not q:
         return jsonify({'error': 'Question is required.'}), 400
 
-    if openai and getattr(openai, 'api_key', None):
-        total = (
-            db.session.query(db.func.sum(Expense.amount))  # type: ignore[call-overload]
-            .filter_by(user_id=current_user.id)
-            .scalar()
-        ) or 0
-        user_prompt = f"User question: {q}\nTotal spent: {float(total):.2f}. Target: {current_user.monthly_target}"
+    client = current_app.config.get('OPENAI_CLIENT')
+    if client:
+        # Gather recent expenses for context (last 30 days)
+        now = datetime.now()
+        thirty_days_ago = now - timedelta(days=30)
+        recent_expenses = Expense.query.filter(
+            Expense.user_id == current_user.id,
+            Expense.date >= thirty_days_ago.strftime('%Y-%m-%d')
+        ).all()
+
+        expense_summary = []
+        for e in recent_expenses:
+            expense_summary.append(
+                f"{e.date}: ₹{e.amount} at {e.merchant} ({e.category})")
+        context_str = "\n".join(
+            expense_summary) if expense_summary else "No expenses in the last 30 days."
+
+        total = sum(float(e.amount) for e in recent_expenses)
+
+        system_prompt = (
+            f"You are a helpful financial assistant for {current_user.username}. "
+            f"Their monthly target is ₹{current_user.monthly_target or 'not set'}. "
+            f"Here are their expenses from the last 30 days (Total: ₹{total:.2f}):\n{context_str}\n\n"
+            "Answer the user's questions about their spending accurately and concisely."
+        )
+
         try:
-            ChatCompletion = getattr(openai, 'ChatCompletion', None)
-            if ChatCompletion:
-                res = ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": user_prompt}])
-                return jsonify({'answer': res.choices[0].message['content'].strip()})
-            else:
-                OpenAIClient = getattr(openai, 'OpenAI', None)
-                if not OpenAIClient:
-                    return jsonify({'answer': "OpenAI client not found."})
-                client = OpenAIClient(api_key=openai.api_key)
-                msgs = [{"role": "user", "content": user_prompt}]
-                res = client.chat.completions.create(model="gpt-3.5-turbo", messages=msgs)
-                return jsonify({'answer': res.choices[0].message.content.strip()})
+            res = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": q}
+                ]
+            )
+            return jsonify({'answer': res.choices[0].message.content.strip()})
         except Exception as e:
             logger.error("OpenAI API error: %s", e)
             return jsonify({'answer': "AI service is temporarily unavailable. Please try again."})
 
-    if 'total' in q:
+    # Fallback if no OpenAI client
+    if 'total' in q.lower():
         total = (
-            db.session.query(db.func.sum(Expense.amount))  # type: ignore[call-overload]
+            # type: ignore[call-overload]
+            db.session.query(db.func.sum(Expense.amount))
             .filter_by(user_id=current_user.id)
             .scalar()
         ) or 0
         return jsonify({'answer': f"Your total is ₹{float(total):.2f}."})
-    elif 'target' in q:
+    elif 'target' in q.lower():
         return jsonify({'answer': f"Your target is ₹{current_user.monthly_target}."})
-    return jsonify({'answer': "No AI config. Try asking 'total' or 'target'."})
+    return jsonify({'answer': "OpenAI is not configured. Try asking 'total' or 'target'."})
