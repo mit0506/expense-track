@@ -1,8 +1,10 @@
-from app.models import Subscription, db
+from app.models import Subscription
+
 
 def test_subscriptions_view(auth_client):
     resp = auth_client.get('/subscriptions')
     assert resp.status_code == 200
+
 
 def test_add_subscription(auth_client):
     resp = auth_client.post('/subscriptions', data={
@@ -12,12 +14,13 @@ def test_add_subscription(auth_client):
         'billing_cycle': 'monthly',
         'next_billing_date': '2026-06-01'
     }, follow_redirects=True)
-    
+
     assert resp.status_code == 200
     sub = Subscription.query.filter_by(merchant='Netflix').first()
     assert sub is not None
     assert sub.merchant == 'Netflix'
     assert float(sub.amount) == 15.99
+
 
 def test_delete_subscription(auth_client):
     auth_client.post('/subscriptions', data={
@@ -29,9 +32,10 @@ def test_delete_subscription(auth_client):
     })
     sub = Subscription.query.filter_by(merchant='DeleteSub').first()
     assert sub is not None
-    
-    resp = auth_client.post(f'/subscriptions/delete/{sub.id}', follow_redirects=True)
+
+    resp = auth_client.post(
+        f'/subscriptions/delete/{sub.id}', follow_redirects=True)
     assert resp.status_code == 200
-    
+
     deleted_sub = Subscription.query.filter_by(merchant='DeleteSub').first()
     assert deleted_sub is None
