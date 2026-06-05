@@ -88,12 +88,28 @@ def inject_global_data():
                     'message': f'{cb.category} at {cat_pct:.0f}% of budget. ₹{limit - spent:.0f} left.',
                 })
 
+    from app.models import Subscription
+    subs = Subscription.query.filter_by(user_id=current_user.id, auto_log=True).all()
+    upcoming_subs = []
+    today_date = datetime.today().date()
+    for sub in subs:
+        if sub.next_billing_date:
+            try:
+                next_date = datetime.strptime(sub.next_billing_date, '%Y-%m-%d').date()
+                days_until = (next_date - today_date).days
+                if 0 <= days_until <= 3:
+                    sub.days_until = days_until
+                    upcoming_subs.append(sub)
+            except ValueError:
+                pass
+
     return {
         'monthly_total': total_float,
         'net_balance': net_balance,
         'monthly_target_float': monthly_target,
         'monthly_income_float': float(current_user.monthly_income or 0),
         'budget_alerts': budget_alerts,
+        'upcoming_subs': upcoming_subs,
     }
 
 
