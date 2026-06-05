@@ -14,6 +14,7 @@
     </script>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>{% block title %}Machined Tactile - Expense Tracker{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"/>
@@ -62,6 +63,10 @@
                     <a class="tactile-nav-item {% if request.endpoint == 'main.subscriptions' %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-all group" href="{{ url_for('main.subscriptions') }}">
                         <span class="material-symbols-outlined text-[18px] transition-transform group-hover:scale-110">update</span>
                         <span class="font-mono uppercase tracking-wider text-[11px]">Subscriptions</span>
+                    </a>
+                    <a class="tactile-nav-item {% if request.endpoint == 'main.network_splits' %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-all group" href="{{ url_for('main.network_splits') }}">
+                        <span class="material-symbols-outlined text-[18px] transition-transform group-hover:scale-110">call_split</span>
+                        <span class="font-mono uppercase tracking-wider text-[11px]">Network Splits</span>
                     </a>
                     <a class="tactile-nav-item {% if request.endpoint == 'main.profile' %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-all group" href="{{ url_for('main.profile') }}">
                         <span class="material-symbols-outlined text-[18px] transition-transform group-hover:scale-110">account_circle</span>
