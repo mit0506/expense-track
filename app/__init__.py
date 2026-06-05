@@ -80,18 +80,19 @@ def create_app():
         if request.path.startswith('/api/'):
             return jsonify({'error': 'Rate limit exceeded. Please try again later.'}), 429
         flash('Too many requests. Please slow down.')
+        from urllib.parse import urlsplit
+
         target = request.referrer or '/'
-        if target != '/':
-            from urllib.parse import urlparse
-            normalized_target = target.replace('\\', '/')
-            parsed = urlparse(normalized_target)
-            if (parsed.scheme or parsed.netloc) and parsed.netloc != request.host:
-                target = '/'
-            elif parsed.scheme and not parsed.netloc:
-                target = '/'
-            else:
-                target = normalized_target
-        return redirect(target)
+        normalized_target = target.replace('\\', '/')
+        parsed = urlsplit(normalized_target)
+
+        safe_target = '/'
+        if not parsed.scheme and not parsed.netloc:
+            path = parsed.path or '/'
+            if path.startswith('/') and not path.startswith('//'):
+                safe_target = normalized_target
+
+        return redirect(safe_target)
 
     @app.errorhandler(500)
     def server_error(e):
