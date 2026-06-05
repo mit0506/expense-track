@@ -52,7 +52,8 @@ def test_api_custom_visualization_invalid_dates(auth_client):
 
 
 def test_api_custom_visualization_valid(auth_client):
-    resp = auth_client.get('/api/visualization/custom?start=2026-01-01&end=2026-12-31')
+    resp = auth_client.get(
+        '/api/visualization/custom?start=2026-01-01&end=2026-12-31')
     assert resp.status_code == 200
     data = json.loads(resp.data)
     assert 'pie' in data
