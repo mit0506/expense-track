@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Network Splits{% endblock %}
+{% block header_title %}Network Splits{% endblock %}
+{% block content %}
+<div class="flex flex-col gap-6">
+
+    <!-- Active Debts (I owe others) -->
+    <div class="machined-plate rounded-sm overflow-hidden border border-white/5 relative z-10 w-full lg:max-w-[800px]">
+        <div class="bg-primary/5 px-4 py-3 flex justify-between items-center border-b border-primary/20">
+            <span class="text-[9px] font-mono text-primary uppercase tracking-widest">Active_Debts (Outbound)</span>
+            <span class="text-[9px] font-mono text-primary uppercase">{{ debts|length }} nodes</span>
+        </div>
+        {% if debts %}
+        <div class="flex flex-col">
+            {% for split, expense, user in debts %}
+            <div class="px-4 py-4 border-b border-white/5 hover:bg-white/[0.02] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/30">
+                        <span class="material-symbols-outlined text-primary text-[18px]">arrow_outward</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-bold text-text-main">To: {{ user.username }}</span>
+                            <span class="px-1.5 py-0.5 rounded-sm bg-surface-inset text-[8px] font-mono text-text-muted uppercase tracking-wider border border-white/5">{{ expense.merchant }}</span>
+                        </div>
+                        <div class="text-[10px] font-mono text-text-muted mt-1 uppercase tracking-wider">
+                            Origin TX: <span class="text-accent-cyan">{{ expense.date }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between sm:justify-end gap-6 sm:gap-4 w-full sm:w-auto">
+                    <div class="text-right">
+                        <div class="text-sm font-mono font-bold text-primary tabular-nums block">₹{{ "%.2f"|format(split.amount) }}</div>
+                    </div>
+                    <form method="POST" action="{{ url_for('main.settle_split', split_id=split.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="machined-button px-3 py-1 bg-surface-inset border border-white/10 text-text-main font-mono text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 group hover:border-accent-cyan hover:text-accent-cyan transition-colors" onclick="return confirm('Mark this debt as settled?')">
+                            <span class="material-symbols-outlined text-[14px]">done_all</span> Settle
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-8 text-center flex flex-col items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-text-muted/30 text-4xl mb-2 block">task_alt</span>
+            <span class="text-sm text-text-muted font-mono uppercase tracking-widest block">No outbound debts</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Active Credits (Others owe me) -->
+    <div class="machined-plate rounded-sm overflow-hidden border border-white/5 relative z-10 w-full lg:max-w-[800px]">
+        <div class="bg-accent-cyan/5 px-4 py-3 flex justify-between items-center border-b border-accent-cyan/20">
+            <span class="text-[9px] font-mono text-accent-cyan uppercase tracking-widest">Active_Credits (Inbound)</span>
+            <span class="text-[9px] font-mono text-accent-cyan uppercase">{{ credits|length }} nodes</span>
+        </div>
+        {% if credits %}
+        <div class="flex flex-col">
+            {% for split, expense, user in credits %}
+            <div class="px-4 py-4 border-b border-white/5 hover:bg-white/[0.02] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-accent-cyan/10 flex items-center justify-center shrink-0 border border-accent-cyan/30">
+                        <span class="material-symbols-outlined text-accent-cyan text-[18px]">south_west</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-bold text-text-main">From: {{ user.username }}</span>
+                            <span class="px-1.5 py-0.5 rounded-sm bg-surface-inset text-[8px] font-mono text-text-muted uppercase tracking-wider border border-white/5">{{ expense.merchant }}</span>
+                        </div>
+                        <div class="text-[10px] font-mono text-text-muted mt-1 uppercase tracking-wider">
+                            Origin TX: <span class="text-accent-cyan">{{ expense.date }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between sm:justify-end gap-6 sm:gap-4 w-full sm:w-auto">
+                    <div class="text-right">
+                        <div class="text-sm font-mono font-bold text-accent-cyan tabular-nums block">₹{{ "%.2f"|format(split.amount) }}</div>
+                    </div>
+                    <form method="POST" action="{{ url_for('main.settle_split', split_id=split.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="machined-button px-3 py-1 bg-surface-inset border border-white/10 text-text-main font-mono text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 group hover:border-accent-cyan hover:text-accent-cyan transition-colors" onclick="return confirm('Mark this credit as settled?')">
+                            <span class="material-symbols-outlined text-[14px]">done_all</span> Settle
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-8 text-center flex flex-col items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-text-muted/30 text-4xl mb-2 block">task_alt</span>
+            <span class="text-sm text-text-muted font-mono uppercase tracking-widest block">No inbound credits</span>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
