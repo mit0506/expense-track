@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}AI Assistant - Machined Tactile{% endblock %}
+{% block header_title %}Module // AI_Assistant{% endblock %}
+
+{% block content %}
+<div class="max-w-[800px] mx-auto w-full">
+    <!-- AI Terminal -->
+    <div class="machined-plate rounded-md overflow-hidden flex flex-col h-[600px] shadow-2xl relative">
+        <div class="absolute top-0 left-0 w-full h-[2px] bg-primary"></div>
+        
+        <header class="h-12 border-b border-white/10 bg-surface-inset flex items-center justify-between px-6 shrink-0 mt-[2px]">
+            <div class="flex items-center gap-3">
+                <div class="flex gap-1.5">
+                    <div class="w-2 h-2 rounded-full bg-primary/80"></div>
+                    <div class="w-2 h-2 rounded-full bg-accent-cyan/80"></div>
+                    <div class="w-2 h-2 rounded-full bg-white/20"></div>
+                </div>
+                <h3 class="text-[10px] font-mono text-text-muted uppercase tracking-[0.1em] ml-2">Neural_Processor // Terminal v3.0</h3>
+            </div>
+            <span class="text-[9px] font-mono text-accent-cyan bg-accent-cyan/10 px-2 py-1 rounded-sm uppercase tracking-widest border border-accent-cyan/20">Active_Session</span>
+        </header>
+        
+        <div id="chatBox" class="flex-1 overflow-y-auto p-6 flex flex-col gap-5 font-mono text-xs uppercase scroll-smooth bg-black/20">
+            <div class="text-accent-cyan opacity-80 leading-relaxed">
+                [SYSTEM] INITIALIZING NEURAL INTERFACE...<br>
+                [SYSTEM] CONNECTING TO SECURE OPENAI ENDPOINT... SUCCESS.<br>
+                [SYSTEM] READY FOR NATURAL LANGUAGE QUERIES.
+            </div>
+            <div class="flex gap-4">
+                <span class="text-primary font-bold shrink-0">ASSISTANT_BOT >></span>
+                <span class="text-text-muted leading-relaxed">How can I assist with your financial oversight today?</span>
+            </div>
+        </div>
+
+        <div class="p-5 bg-surface-inset border-t border-white/10 flex gap-4 items-center">
+            <span class="text-accent-cyan font-mono text-xs font-bold hidden sm:inline tracking-widest">REQ_INP_</span>
+            <input type="text" id="chatInput" 
+                   class="bg-transparent border-none text-sm font-mono text-text-main flex-1 focus:outline-none focus:ring-0 p-0 placeholder:text-text-muted/30" 
+                   placeholder="Type your question...">
+            <button onclick="sendQuestion()" class="machined-button px-6 h-10 bg-primary text-text-main text-[11px] font-mono font-bold uppercase tracking-widest flex items-center gap-2 group hover:bg-primary/90">
+                <span class="material-symbols-outlined text-[16px] group-active:translate-x-1 transition-transform">send</span>
+                <span class="hidden sm:inline">Execute</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function sendQuestion() {
+        const input = document.getElementById('chatInput');
+        const question = input.value.trim();
+        if (!question) return;
+        
+        const box = document.getElementById('chatBox');
+        
+        // User Message
+        const userContainer = document.createElement('div');
+        userContainer.className = 'flex gap-4';
+        const userLabel = document.createElement('span');
+        userLabel.className = 'text-accent-cyan font-bold tracking-widest shrink-0';
+        userLabel.textContent = 'USER_OPS >>';
+        const userText = document.createElement('span');
+        userText.className = 'text-text-main leading-relaxed';
+        userText.textContent = question;
+        userContainer.appendChild(userLabel);
+        userContainer.appendChild(userText);
+        box.appendChild(userContainer);
+        input.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        // Bot Thinking
+        const thinking = document.createElement('div');
+        thinking.className = 'text-text-muted opacity-50 italic';
+        thinking.id = 'thinking-indicator';
+        thinking.textContent = '[PROCESSING...]';
+        box.appendChild(thinking);
+        
+        fetch('/chat', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json', 'X-CSRFToken': '{{ csrf_token() }}'},
+            body: JSON.stringify({question: question})
+        })
+        .then(res=>res.json())
+        .then(data=>{
+            document.getElementById('thinking-indicator').remove();
+            const botContainer = document.createElement('div');
+            botContainer.className = 'flex gap-4';
+            const botLabel = document.createElement('span');
+            botLabel.className = 'text-primary font-bold tracking-widest shrink-0';
+            botLabel.textContent = 'ASSISTANT_BOT >>';
+            const botText = document.createElement('span');
+            botText.className = 'text-text-muted leading-relaxed';
+            botText.textContent = data.answer;
+            botContainer.appendChild(botLabel);
+            botContainer.appendChild(botText);
+            box.appendChild(botContainer);
+            box.scrollTop = box.scrollHeight;
+        })
+        .catch(err=>{
+            document.getElementById('thinking-indicator').remove();
+            const botContainer = document.createElement('div');
+            botContainer.className = 'flex gap-4 text-primary';
+            const errLabel = document.createElement('span');
+            errLabel.className = 'font-bold tracking-widest shrink-0';
+            errLabel.textContent = 'SYSTEM_ERROR >>';
+            const errText = document.createElement('span');
+            errText.textContent = 'CRITICAL FAIL IN NEURAL PROCESSING.';
+            botContainer.appendChild(errLabel);
+            botContainer.appendChild(errText);
+            box.appendChild(botContainer);
+        });
+    }
+
+    document.getElementById('chatInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendQuestion();
+    });
+</script>
+{% endblock %}
