@@ -22,7 +22,7 @@ def inject_global_data():
     prefix = today.strftime('%Y-%m')
     total_spending = (
         db.session.query(db.func.sum(Expense.amount))
-        .filter(Expense.user_id == current_user.id, Expense.date.like(f'{prefix}%'))
+        .filter(Expense.user_id == current_user.id, Expense.date.like(f'{prefix}%'))  # type: ignore[attr-defined]
         .scalar()
     ) or 0.0
 
@@ -66,7 +66,7 @@ def inject_global_data():
     if cat_budgets:
         cat_rows = (
             db.session.query(Expense.category, db.func.sum(Expense.amount))
-            .filter(Expense.user_id == current_user.id, Expense.date.like(f'{prefix}%'))
+            .filter(Expense.user_id == current_user.id, Expense.date.like(f'{prefix}%'))  # type: ignore[attr-defined]
             .group_by(Expense.category)
             .all()
         )
