@@ -83,8 +83,14 @@ def create_app():
         target = request.referrer or '/'
         if target != '/':
             from urllib.parse import urlparse
-            if urlparse(target).netloc not in ('', request.host):
+            normalized_target = target.replace('\\', '/')
+            parsed = urlparse(normalized_target)
+            if (parsed.scheme or parsed.netloc) and parsed.netloc != request.host:
                 target = '/'
+            elif parsed.scheme and not parsed.netloc:
+                target = '/'
+            else:
+                target = normalized_target
         return redirect(target)
 
     @app.errorhandler(500)
