@@ -55,6 +55,10 @@
                         <span class="material-symbols-outlined text-[18px] transition-transform group-hover:scale-110">lightbulb</span>
                         <span class="font-mono uppercase tracking-wider text-[11px]">Insights</span>
                     </a>
+                    <a class="tactile-nav-item {% if request.endpoint == 'main.chatbot' %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-all group" href="{{ url_for('main.chatbot') }}">
+                        <span class="material-symbols-outlined text-[18px] transition-transform group-hover:scale-110">smart_toy</span>
+                        <span class="font-mono uppercase tracking-wider text-[11px]">AI Assistant</span>
+                    </a>
                     <a class="tactile-nav-item {% if request.endpoint == 'main.subscriptions' %}active{% endif %} flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-all group" href="{{ url_for('main.subscriptions') }}">
                         <span class="material-symbols-outlined text-[18px] transition-transform group-hover:scale-110">update</span>
                         <span class="font-mono uppercase tracking-wider text-[11px]">Subscriptions</span>
