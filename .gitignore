@@ -14,7 +14,6 @@ recreate_db.py
 add_table.py
 add_sub.py
 make_avatar.py
-.vscode/
 .idea/
 .DS_Store
 .claude
