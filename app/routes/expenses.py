@@ -250,6 +250,8 @@ def add_sms():
         db.session.commit()
         return redirect(url_for('main.index'))
     return render_template('add_sms.html')
+
+
 @main_bp.route('/splits', methods=['GET'])
 @login_required
 def network_splits():
@@ -260,7 +262,7 @@ def network_splits():
         UserProfile, BillSplit.payer_id == UserProfile.id
     ).filter(
         BillSplit.debtor_id == current_user.id,
-        BillSplit.settled == False
+        BillSplit.settled.is_(False)
     ).all()
 
     # Credits: Others owe me
@@ -270,7 +272,7 @@ def network_splits():
         UserProfile, BillSplit.debtor_id == UserProfile.id
     ).filter(
         BillSplit.payer_id == current_user.id,
-        BillSplit.settled == False
+        BillSplit.settled.is_(False)
     ).all()
 
     return render_template('splits.html', debts=debts, credits=credits)
