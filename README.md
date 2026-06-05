@@ -22,7 +22,6 @@ A modern, responsive Flask-based expense tracker featuring manual entry, receipt
 - **Python 3.10+**
 - **Tesseract OCR**: Required for receipt scanning.
   - [Download Tesseract for Windows](https://github.com/UB-Mannheim/tesseract/wiki)
-  - Install to `C:\Program Files\Tesseract-OCR` (default location)
 
 ## Setup Instructions
 
@@ -62,6 +61,21 @@ A modern, responsive Flask-based expense tracker featuring manual entry, receipt
    ```
    Open `http://127.0.0.1:5000` in your browser.
 
+## Docker Deployment
+
+You can build and run your own Docker container for this application to easily deploy it to any environment.
+
+1. **Build the Docker Image**
+   ```bash
+   docker build -t expense-track-web .
+   ```
+
+2. **Run the Container (Using Docker Compose)**
+   We recommend using `docker-compose` to automatically manage the container and database volume:
+   ```bash
+   docker-compose up --build
+   ```
+   This will start the application on port **5173**. Open `http://localhost:5173` in your browser.
 ## Project Structure
 
 - `app/`: The core application package.
