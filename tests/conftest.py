@@ -52,5 +52,6 @@ def auth_client(app):
         _db.session.commit()
 
         with app.test_client() as c:
-            c.post('/login', data={'username': 'testuser', 'password': 'password123'})
+            c.post('/login', data={'username': 'testuser',
+                   'password': 'password123'})
             yield c
