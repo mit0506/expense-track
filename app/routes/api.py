@@ -144,7 +144,7 @@ def chat():
 
     if openai and getattr(openai, 'api_key', None):
         total = (
-            db.session.query(db.func.sum(Expense.amount))
+            db.session.query(db.func.sum(Expense.amount))  # type: ignore[call-overload]
             .filter_by(user_id=current_user.id)
             .scalar()
         ) or 0
@@ -168,7 +168,7 @@ def chat():
 
     if 'total' in q:
         total = (
-            db.session.query(db.func.sum(Expense.amount))
+            db.session.query(db.func.sum(Expense.amount))  # type: ignore[call-overload]
             .filter_by(user_id=current_user.id)
             .scalar()
         ) or 0

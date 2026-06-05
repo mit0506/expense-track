@@ -41,7 +41,7 @@ def register():
 
         user = UserProfile(
             username=username,
-            password_hash=generate_password_hash(password),
+            password_hash=generate_password_hash(str(password)),
             monthly_income=current_app.config.get('MONTHLY_INCOME', 50000)
         )
         db.session.add(user)
