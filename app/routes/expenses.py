@@ -75,14 +75,14 @@ def index():
 
     cat_spending: dict[str, float] = {}
     total_monthly = float(
-        db.session.query(db.func.sum(Expense.amount))
+        db.session.query(db.func.sum(Expense.amount))  # type: ignore[call-overload]
         .filter(Expense.user_id == current_user.id, Expense.date.like(f'{prefix}%'))  # type: ignore[attr-defined]
         .scalar() or 0
     )
 
     # Category breakdown for current month
     cat_rows = (
-        db.session.query(Expense.category, db.func.sum(Expense.amount))
+        db.session.query(Expense.category, db.func.sum(Expense.amount))  # type: ignore[call-overload]
         .filter(Expense.user_id == current_user.id, Expense.date.like(f'{prefix}%'))  # type: ignore[attr-defined]
         .group_by(Expense.category)
         .all()
@@ -271,7 +271,7 @@ def split_expense(expense_id):
 def settle_split(split_id):
     split = BillSplit.query.filter(
         (BillSplit.id == split_id)
-        & ((BillSplit.payer_id == current_user.id) | (BillSplit.debtor_id == current_user.id))
+        & ((BillSplit.payer_id == current_user.id) | (BillSplit.debtor_id == current_user.id))  # type: ignore
     ).first_or_404()
     split.settled = True
     db.session.commit()
