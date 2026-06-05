@@ -19,6 +19,7 @@ def app():
     # Disable rate limiter in tests
     from app import limiter
     limiter.enabled = False
+    app.config['OPENAI_CLIENT'] = None
     yield app
 
 
