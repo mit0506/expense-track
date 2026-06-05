@@ -71,8 +71,8 @@
             {% for sub in subscriptions %}
             <div class="px-4 py-4 border-b border-white/5 hover:bg-white/[0.02] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
                 <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-full machined-inset flex items-center justify-center shrink-0 border border-white/5">
-                        <span class="material-symbols-outlined text-text-muted text-[18px]">event_repeat</span>
+                    <div class="w-10 h-10 rounded-full machined-inset flex items-center justify-center shrink-0 border {% if sub.days_until <= 5 %}border-primary bg-primary/10{% else %}border-white/5{% endif %}">
+                        <span class="material-symbols-outlined {% if sub.days_until <= 5 %}text-primary animate-pulse{% else %}text-text-muted{% endif %} text-[18px]">event_repeat</span>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
@@ -80,7 +80,13 @@
                             <span class="px-1.5 py-0.5 rounded-sm bg-surface-inset text-[8px] font-mono text-text-muted uppercase tracking-wider border border-white/5">{{ sub.category }}</span>
                         </div>
                         <div class="text-[10px] font-mono text-text-muted mt-1 uppercase tracking-wider">
-                            Next: <span class="text-accent-cyan">{{ sub.next_billing_date }}</span> // <span class="text-primary">{{ sub.billing_cycle }}</span>
+                            Next: <span class="text-accent-cyan">{{ sub.next_billing_date }}</span> 
+                            {% if sub.days_until <= 5 %}
+                                <span class="text-primary font-bold ml-1 animate-pulse">(Due in {{ sub.days_until }} days)</span>
+                            {% else %}
+                                <span class="text-text-muted/50 ml-1">(In {{ sub.days_until }} days)</span>
+                            {% endif %}
+                            // <span class="text-primary">{{ sub.billing_cycle }}</span>
                         </div>
                     </div>
                 </div>
