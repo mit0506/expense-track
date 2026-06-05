@@ -61,6 +61,7 @@ def test_edit_expense(auth_client):
         'payment_type': 'Cash',
     })
     expense = Expense.query.filter_by(merchant='EditMe').first()
+    assert expense is not None
     resp = auth_client.post(f'/edit/{expense.id}', data={
         'date': '2026-04-02',
         'merchant': 'EditedStore',
@@ -70,6 +71,7 @@ def test_edit_expense(auth_client):
     }, follow_redirects=True)
     assert resp.status_code == 200
     updated = Expense.query.get(expense.id)
+    assert updated is not None
     assert updated.merchant == 'EditedStore'
     assert float(updated.amount) == 200.0
 
@@ -83,6 +85,7 @@ def test_delete_expense(auth_client):
         'payment_type': 'Cash',
     })
     expense = Expense.query.filter_by(merchant='DeleteMe').first()
+    assert expense is not None
     resp = auth_client.post(f'/delete/{expense.id}', follow_redirects=True)
     assert resp.status_code == 200
     assert Expense.query.get(expense.id) is None
