@@ -41,7 +41,7 @@ def api_expenses():
     pagination = (
         Expense.query
         .filter_by(user_id=current_user.id)
-        .order_by(Expense.date.desc())
+        .order_by(Expense.date.desc())  # type: ignore[attr-defined]
         .paginate(page=page, per_page=per_page, error_out=False)
     )
     return jsonify({
@@ -155,7 +155,10 @@ def chat():
                 res = ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": user_prompt}])
                 return jsonify({'answer': res.choices[0].message['content'].strip()})
             else:
-                client = getattr(openai, 'OpenAI', None)(api_key=openai.api_key)
+                OpenAIClient = getattr(openai, 'OpenAI', None)
+                if not OpenAIClient:
+                    return jsonify({'answer': "OpenAI client not found."})
+                client = OpenAIClient(api_key=openai.api_key)
                 msgs = [{"role": "user", "content": user_prompt}]
                 res = client.chat.completions.create(model="gpt-3.5-turbo", messages=msgs)
                 return jsonify({'answer': res.choices[0].message.content.strip()})
