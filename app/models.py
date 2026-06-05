@@ -48,6 +48,11 @@ class CategoryBudget(db.Model):
     def to_dict(self):
         return {'category': self.category, 'amount': float(self.amount) if self.amount else 0.0}
 
+    def __init__(self, user_id, category, amount=0.0):
+        self.user_id = user_id
+        self.category = category
+        self.amount = amount
+
 
 class Subscription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -60,6 +65,16 @@ class Subscription(db.Model):
     auto_log = db.Column(db.Boolean, default=True)
     last_processed = db.Column(db.String(20), nullable=True)
 
+    def __init__(self, user_id, merchant, amount, category=None, billing_cycle='monthly', next_billing_date='', auto_log=True, last_processed=None):
+        self.user_id = user_id
+        self.merchant = merchant
+        self.amount = amount
+        self.category = category
+        self.billing_cycle = billing_cycle
+        self.next_billing_date = next_billing_date
+        self.auto_log = auto_log
+        self.last_processed = last_processed
+
 
 class BillSplit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,6 +83,13 @@ class BillSplit(db.Model):
     debtor_id = db.Column(db.Integer, db.ForeignKey('user_profile.id'), nullable=False, index=True)
     amount = db.Column(Numeric(10, 2), nullable=False)
     settled = db.Column(db.Boolean, default=False)
+
+    def __init__(self, expense_id, payer_id, debtor_id, amount, settled=False):
+        self.expense_id = expense_id
+        self.payer_id = payer_id
+        self.debtor_id = debtor_id
+        self.amount = amount
+        self.settled = settled
 
 
 class UserProfile(UserMixin, db.Model):
