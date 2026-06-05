@@ -65,7 +65,7 @@ def index():
     pagination = (
         Expense.query
         .filter_by(user_id=current_user.id)
-        .order_by(Expense.date.desc(), Expense.id.desc())
+        .order_by(Expense.date.desc(), Expense.id.desc())  # type: ignore[attr-defined]
         .paginate(page=page, per_page=per_page, error_out=False)
     )
     expenses = pagination.items
@@ -76,14 +76,14 @@ def index():
     cat_spending: dict[str, float] = {}
     total_monthly = float(
         db.session.query(db.func.sum(Expense.amount))
-        .filter(Expense.user_id == current_user.id, Expense.date.like(f'{prefix}%'))
+        .filter(Expense.user_id == current_user.id, Expense.date.like(f'{prefix}%'))  # type: ignore[attr-defined]
         .scalar() or 0
     )
 
     # Category breakdown for current month
     cat_rows = (
         db.session.query(Expense.category, db.func.sum(Expense.amount))
-        .filter(Expense.user_id == current_user.id, Expense.date.like(f'{prefix}%'))
+        .filter(Expense.user_id == current_user.id, Expense.date.like(f'{prefix}%'))  # type: ignore[attr-defined]
         .group_by(Expense.category)
         .all()
     )
@@ -282,7 +282,7 @@ def settle_split(split_id):
 @login_required
 @limiter.limit("10 per minute")
 def export_csv():
-    expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date.desc()).all()
+    expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date.desc()).all()  # type: ignore[attr-defined]
     si = StringIO()
     cw = csv.writer(si)
     cw.writerow(['ID', 'Date', 'Merchant', 'Amount', 'Category', 'Payment_Type'])
@@ -300,7 +300,7 @@ def export_csv():
 @login_required
 @limiter.limit("10 per minute")
 def export_pdf():
-    expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date.desc()).all()
+    expenses = Expense.query.filter_by(user_id=current_user.id).order_by(Expense.date.desc()).all()  # type: ignore[attr-defined]
 
     pdf = FPDF()
     pdf.add_page()
@@ -342,11 +342,9 @@ def export_pdf():
     pdf.cell(col_widths[2], 8, f'{total:.2f}', border=1, align='R')
     pdf.cell(col_widths[3] + col_widths[4], 8, '', border=1)
 
-    buf = BytesIO()
-    pdf.output(buf)
-    buf.seek(0)
+    pdf_bytes = pdf.output()
     return Response(
-        buf.getvalue(),
+        bytes(pdf_bytes),
         mimetype="application/pdf",
         headers={"Content-Disposition": "attachment;filename=expenses_export.pdf"}
     )
