@@ -53,7 +53,7 @@ def subscriptions():
                 sub.days_until = 999
         else:
             sub.days_until = 999
-            
+
     return render_template('subscriptions.html', subscriptions=subs)
 
 
