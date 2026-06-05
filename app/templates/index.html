@@ -2,7 +2,7 @@
 endblock %} {% block header_title %}System Dashboard{% endblock %} {% block
 content %}
 <!-- Metric Dials -->
-<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
   <!-- Balance -->
   <div
     class="machined-plate rounded-md p-6 relative group h-[130px] flex flex-col justify-between overflow-hidden transition-all hover:-translate-y-1 hover:shadow-primary/10">
@@ -89,6 +89,34 @@ content %}
     <div
       class="absolute -right-4 -bottom-4 w-16 h-16 rounded-full blur-2xl transition-colors opacity-[0.05] {{ health_class }}"></div>
   </div>
+
+  <!-- Net Balance -->
+  <div
+    class="machined-plate rounded-md p-6 relative group h-[130px] flex flex-col justify-between overflow-hidden transition-all hover:-translate-y-1 hover:shadow-primary/10">
+    <div class="flex justify-between items-start">
+      <span
+        class="text-text-muted font-mono text-[11px] tracking-[0.05em] uppercase"
+        >Network // Liquid</span
+      >
+      <span
+        class="material-symbols-outlined text-text-muted text-[18px] group-hover:text-accent-cyan transition-colors"
+        >account_tree</span
+      >
+    </div>
+    <div class="flex items-baseline gap-2">
+      <span class="{% if net_balance < 0 %}text-primary{% else %}text-accent-cyan{% endif %} font-mono text-sm opacity-50">₹</span>
+      <span
+        class="font-mono text-4xl font-bold tabular-nums tracking-tight {% if net_balance < 0 %}text-primary{% else %}group-hover:text-accent-cyan{% endif %} transition-colors">
+        {{ "%.2f"|format(net_balance) }}
+      </span>
+    </div>
+    {% set liquid_class = 'health-over' if net_balance < 0 else 'health-under' %}
+    <!-- LED Accent -->
+    <div
+      class="absolute top-0 left-0 w-full h-[2px] opacity-30 group-hover:opacity-100 transition-opacity {{ liquid_class }}"></div>
+    <div
+      class="absolute -right-4 -bottom-4 w-16 h-16 rounded-full blur-2xl transition-colors opacity-[0.05] {{ liquid_class }}"></div>
+  </div>
 </section>
 
 <style>
@@ -102,7 +130,7 @@ content %}
 </style>
 
 <!-- Budget Alerts -->
-{% if budget_alerts %}
+{% if budget_alerts or upcoming_subs %}
 <section class="flex flex-col gap-3">
   {% for alert in budget_alerts %}
   <div class="{% if alert.level == 'critical' %}bg-primary/10 border-primary/30{% elif alert.level == 'warning' %}bg-yellow-500/10 border-yellow-500/30{% else %}bg-accent-cyan/10 border-accent-cyan/30{% endif %} border p-4 rounded-sm flex items-center gap-4 relative overflow-hidden">
@@ -112,6 +140,21 @@ content %}
       </span>
     </div>
     <p class="text-[11px] font-mono text-text-main uppercase tracking-wider">{{ alert.message }}</p>
+  </div>
+  {% endfor %}
+
+  {% for sub in upcoming_subs %}
+  <div class="bg-surface/50 border border-white/10 p-4 rounded-sm flex items-center justify-between gap-4 relative overflow-hidden hover:bg-surface transition-colors">
+    <div class="flex items-center gap-4">
+      <div class="w-8 h-8 rounded-sm machined-inset flex items-center justify-center shrink-0 border border-accent-cyan/30">
+        <span class="material-symbols-outlined text-accent-cyan text-[18px]">event_repeat</span>
+      </div>
+      <div>
+        <p class="text-[11px] font-mono text-text-main uppercase tracking-wider">Upcoming Renewal: {{ sub.merchant }}</p>
+        <p class="text-[9px] font-mono text-text-muted uppercase mt-1">₹{{ "%.2f"|format(sub.amount) }} // Due in {{ sub.days_until }} days</p>
+      </div>
+    </div>
+    <a href="{{ url_for('main.subscriptions') }}" class="machined-plate px-3 py-1.5 text-[9px] font-mono text-text-muted hover:text-white uppercase tracking-widest transition-colors rounded-sm hidden sm:block">View Nodes</a>
   </div>
   {% endfor %}
 </section>

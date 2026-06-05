@@ -250,6 +250,30 @@ def add_sms():
         db.session.commit()
         return redirect(url_for('main.index'))
     return render_template('add_sms.html')
+@main_bp.route('/splits', methods=['GET'])
+@login_required
+def network_splits():
+    # Debts: I owe others
+    debts = db.session.query(BillSplit, Expense, UserProfile).join(
+        Expense, BillSplit.expense_id == Expense.id
+    ).join(
+        UserProfile, BillSplit.payer_id == UserProfile.id
+    ).filter(
+        BillSplit.debtor_id == current_user.id,
+        BillSplit.settled == False
+    ).all()
+
+    # Credits: Others owe me
+    credits = db.session.query(BillSplit, Expense, UserProfile).join(
+        Expense, BillSplit.expense_id == Expense.id
+    ).join(
+        UserProfile, BillSplit.debtor_id == UserProfile.id
+    ).filter(
+        BillSplit.payer_id == current_user.id,
+        BillSplit.settled == False
+    ).all()
+
+    return render_template('splits.html', debts=debts, credits=credits)
 
 
 @main_bp.route('/split/<int:expense_id>', methods=['GET', 'POST'])
