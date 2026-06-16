@@ -120,6 +120,15 @@ def create_app():
             return jsonify({'error': 'Internal server error'}), 500
         return render_template('errors/500.html'), 500
 
+    @app.after_request
+    def add_security_headers(response):
+        response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none';"
+        response.headers['Permissions-Policy'] = "camera=(), microphone=(), geolocation=(), payment=(), usb=(), accelerometer=(), gyroscope=(), magnetometer=()"
+        response.headers['Referrer-Policy'] = "strict-origin-when-cross-origin"
+        response.headers['X-Content-Type-Options'] = "nosniff"
+        response.headers['X-Frame-Options'] = "DENY"
+        return response
+
     with app.app_context():
         db.create_all()
 
