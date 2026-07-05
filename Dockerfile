@@ -9,6 +9,11 @@ RUN npm run build
 # Stage 2: Build the Python application
 FROM python:3.10-slim
 
+# OCI labels to connect the published image to the GitHub repository
+LABEL org.opencontainers.image.source="https://github.com/mit0506/expense-track"
+LABEL org.opencontainers.image.description="Expense Tracker Application"
+LABEL org.opencontainers.image.licenses="MIT"
+
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
