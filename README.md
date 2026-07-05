@@ -8,6 +8,8 @@
 
 A modern, responsive Flask-based expense tracker featuring manual entry, receipt OCR, SMS parsing, and visual insights.
 
+![Dashboard Preview](assets/Dashboard%20-%20Expense%20Tracker.png)
+
 ## Features
 
 - **Responsive Dashboard**: Track your spending at a glance.
