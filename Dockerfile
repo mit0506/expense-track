@@ -1,5 +1,5 @@
 # Stage 1: Build the frontend (Tailwind CSS)
-FROM node:18-alpine AS node-builder
+FROM node:26-alpine AS node-builder
 WORKDIR /build
 COPY package*.json ./
 RUN npm install
