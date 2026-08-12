@@ -25,7 +25,7 @@
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.11",
-    "autoprefixer": "^10.4.27",
+    "autoprefixer": "^10.5.4",
     "postcss": "^8.5.26",
     "tailwindcss": "^4.3.3"
   }
