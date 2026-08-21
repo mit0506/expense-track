@@ -17,20 +17,20 @@ A fast, responsive Flask-based personal finance and expense tracker powered by *
 
 ---
 
-## ✨ Features
+## Features
 
-- **⚡ Reactive HTMX UI**: Seamless dynamic updates (live search, category filters, pagination, inline editing, and row deletion) without page reloads.
-- **🧾 Receipt OCR Scanning**: Upload receipt images to automatically extract merchant, date, and amount via Tesseract OCR.
-- **💬 SMS Transaction Parsing**: Paste raw bank/card SMS alerts to auto-fill expense entries.
-- **📊 Visual Analytics**: Interactive charts for category breakdowns, monthly budgets, and spending trends.
-- **👥 Bill Splitting & Subscriptions**: Track shared expenses with friends and manage recurring subscription renewals.
-- **🤖 AI Financial Chatbot**: Integrated OpenAI assistant to query your spending habits and gain financial insights.
-- **🎯 Monthly Targets & Health Indicators**: Set category-level limits and visual progress dials.
-- **🔒 Secure & Containerized**: Built-in CSRF protection, rate limiting, and single-stage Docker deployment.
+- **Reactive HTMX UI**: Dynamic updates (live search, category filters, pagination, inline editing, and row deletion) without full page reloads.
+- **Receipt OCR Scanning**: Upload receipt images to automatically extract merchant, date, and amount via Tesseract OCR.
+- **SMS Transaction Parsing**: Paste raw bank/card SMS alerts to auto-fill expense entries.
+- **Visual Analytics**: Interactive charts for category breakdowns, monthly budgets, and spending trends.
+- **Bill Splitting & Subscriptions**: Track shared expenses with friends and manage recurring subscription renewals.
+- **AI Financial Chatbot**: Integrated OpenAI assistant to query your spending habits and gain financial insights.
+- **Monthly Targets & Health Indicators**: Set category-level limits and visual progress dials.
+- **Secure & Containerized**: Built-in CSRF protection, rate limiting, and single-stage Docker deployment.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend**: Python 3.10+, Flask, Flask-SQLAlchemy, Flask-Login, Flask-WTF, Flask-Migrate, Flask-Limiter
 - **Frontend**: Jinja2 Templates, HTMX, Tailwind CSS (CDN), Custom Machined Tactile Theme
@@ -40,7 +40,7 @@ A fast, responsive Flask-based personal finance and expense tracker powered by *
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 expense-track/
@@ -83,7 +83,7 @@ expense-track/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -139,7 +139,7 @@ expense-track/
 
 ---
 
-## 🧪 Running Tests
+## Running Tests
 
 Run the full automated test suite using `pytest`:
 
@@ -149,7 +149,7 @@ pytest tests/ -v --tb=short
 
 ---
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 You can run the full application using Docker and Docker Compose without manual Python setup:
 
@@ -162,12 +162,12 @@ You can run the full application using Docker and Docker Compose without manual 
 
 ---
 
-## 📖 Documentation
+## Documentation
 
 - [Tesseract OCR Installation Guide](docs/TESSERACT_INSTALLATION.md)
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
