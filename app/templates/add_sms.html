@@ -14,7 +14,11 @@
             <p class="text-sm text-text-main font-medium">Extract transaction nodes from text buffers</p>
         </header>
 
-        <form method="POST" class="flex flex-col gap-6">
+        <form method="POST"
+              hx-post="{{ url_for('main.add_sms') }}"
+              hx-target="#sms-result-area"
+              hx-indicator="#sms-spinner"
+              class="flex flex-col gap-6">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <!-- SMS Text Area -->
             <div class="flex flex-col gap-2">
@@ -44,13 +48,16 @@
             <div class="flex flex-col sm:flex-row gap-4">
                 <button type="submit" class="machined-button flex-1 h-14 bg-primary text-text-main font-mono font-bold uppercase tracking-widest flex items-center justify-center gap-2 group hover:bg-primary/90 transition-colors">
                     <span class="material-symbols-outlined group-active:translate-y-[1px]">analytics</span>
-                    Execute_Parse
+                    <span>Execute_Parse</span>
+                    <span id="sms-spinner" class="htmx-indicator material-symbols-outlined animate-spin text-[16px] ml-2">sync</span>
                 </button>
                 <a href="{{ url_for('main.index') }}" class="machined-plate flex items-center justify-center px-6 h-14 text-text-muted hover:text-text-main font-mono text-[10px] uppercase tracking-wider transition-colors">
                     Abort
                 </a>
             </div>
         </form>
+
+        <div id="sms-result-area"></div>
     </div>
 </div>
 {% endblock %}

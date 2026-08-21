@@ -13,13 +13,52 @@
       })();
     </script>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="csrf-token" content="{{ csrf_token() }}"/>
     <title>{% block title %}Machined Tactile - Expense Tracker{% endblock %}</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              "primary": "var(--accent)",
+              "background": "var(--bg-main)",
+              "surface": "var(--surface)",
+              "surface-alt": "var(--surface-alt)",
+              "surface-inset": "var(--surface-inset)",
+              "text-main": "var(--text-main)",
+              "text-muted": "var(--text-muted)",
+              "accent-cyan": "var(--accent-secondary)",
+            },
+            fontFamily: {
+              "display": ["Space Grotesk", "sans-serif"],
+              "mono": ["Space Mono", "monospace"],
+            },
+            boxShadow: {
+              "raised": "0 4px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)",
+              "pressed": "inset 0 2px 4px rgba(0,0,0,0.6)",
+              "input": "inset 0 2px 4px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.05)",
+            },
+            borderRadius: {
+              "DEFAULT": "0.125rem",
+              "sm": "0.125rem",
+              "md": "0.25rem",
+              "lg": "0.25rem",
+              "xl": "0.25rem",
+              "full": "0.25rem"
+            },
+          },
+        },
+      }
+    </script>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet"/>
     {% block head %}{% endblock %}
 </head>
 <body class="h-screen w-full overflow-hidden flex selection:bg-primary selection:text-white">
@@ -162,13 +201,20 @@
         }
 
         // Theme Toggle Logic
-        const themeToggle = document.getElementById('theme-toggle');
         if (themeToggle) {
             themeToggle.addEventListener('click', () => {
                 const isDarkNow = document.documentElement.classList.toggle('dark');
                 localStorage.setItem('theme', isDarkNow ? 'dark' : 'light');
             });
         }
+
+        // HTMX CSRF Token handling
+        document.body.addEventListener('htmx:configRequest', (event) => {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            if (csrfToken) {
+                event.detail.headers['X-CSRFToken'] = csrfToken;
+            }
+        });
     </script>
 
         <!-- Right Context Panel (Optional) -->

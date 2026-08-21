@@ -1,12 +1,4 @@
-# Stage 1: Build the frontend (Tailwind CSS)
-FROM node:26-alpine AS node-builder
-WORKDIR /build
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-
-# Stage 2: Build the Python application
+# Single-stage Python application build (Tailwind & HTMX via CDN)
 FROM python:3.14-slim
 
 # OCI labels to connect the published image to the GitHub repository
@@ -43,9 +35,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the application source code
 COPY . .
-
-# Copy the freshly built static files from the Node builder stage
-COPY --from=node-builder /build/app/static/css/style.css ./app/static/css/style.css
 
 # Ensure the uploads directory exists
 RUN mkdir -p uploads

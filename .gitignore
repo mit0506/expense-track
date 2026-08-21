@@ -18,3 +18,5 @@ make_avatar.py
 .DS_Store
 .claude
 .env.docker
+.coverage
+.pytest_cache/
