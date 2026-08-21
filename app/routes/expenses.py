@@ -156,14 +156,16 @@ def add_manual():
         amount = validate_amount(request.form.get('amount'))
         if amount is None:
             if request.headers.get('HX-Request'):
-                return Response('<div class="p-2 text-xs text-primary font-mono">Invalid amount. Must be between 0.01 and 9,999,999.99.</div>', status=400)
+                err_msg = '<div class="p-2 text-xs text-primary font-mono">Invalid amount.</div>'
+                return Response(err_msg, status=400)
             flash('Invalid amount. Must be between 0.01 and 9,999,999.99.')
             return redirect(url_for('main.add_manual'))
 
         date_str = validate_date(request.form.get('date', ''))
         if date_str is None:
             if request.headers.get('HX-Request'):
-                return Response('<div class="p-2 text-xs text-primary font-mono">Invalid date. Use YYYY-MM-DD format.</div>', status=400)
+                err_msg = '<div class="p-2 text-xs text-primary font-mono">Invalid date. Use YYYY-MM-DD.</div>'
+                return Response(err_msg, status=400)
             flash('Invalid date. Use YYYY-MM-DD format.')
             return redirect(url_for('main.add_manual'))
 
@@ -171,7 +173,8 @@ def add_manual():
             request.form.get('merchant', ''), max_length=100)
         if not merchant:
             if request.headers.get('HX-Request'):
-                return Response('<div class="p-2 text-xs text-primary font-mono">Merchant name is required.</div>', status=400)
+                err_msg = '<div class="p-2 text-xs text-primary font-mono">Merchant name is required.</div>'
+                return Response(err_msg, status=400)
             flash('Merchant name is required.')
             return redirect(url_for('main.add_manual'))
 
@@ -307,7 +310,11 @@ def upload_receipt():
                     error = "Error processing image. Please try again or use manual entry."
 
     if request.headers.get('HX-Request') and error:
-        return Response(f'<div class="bg-primary/10 border border-primary/30 p-3 rounded-sm text-xs text-primary font-mono">{error}</div>', status=400)
+        err_html = (
+            f'<div class="bg-primary/10 border border-primary/30 p-3 '
+            f'rounded-sm text-xs text-primary font-mono">{error}</div>'
+        )
+        return Response(err_html, status=400)
 
     return render_template('upload.html', error=error)
 
@@ -319,7 +326,11 @@ def add_sms():
         sms_text = request.form.get('sms_text', '')
         if not sms_text.strip():
             if request.headers.get('HX-Request'):
-                return Response('<div class="bg-primary/10 border border-primary/30 p-3 rounded-sm text-xs text-primary font-mono">Please enter SMS text.</div>', status=400)
+                err_html = (
+                    '<div class="bg-primary/10 border border-primary/30 p-3 '
+                    'rounded-sm text-xs text-primary font-mono">Please enter SMS text.</div>'
+                )
+                return Response(err_html, status=400)
             flash('Please enter SMS text.')
             return redirect(url_for('main.add_sms'))
         parsed = parse_sms(sms_text)
