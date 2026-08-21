@@ -1,0 +1,72 @@
+<form
+  id="expense-row-{{ expense.id }}"
+  hx-post="{{ url_for('main.edit_expense', expense_id=expense.id) }}"
+  hx-target="#expense-row-{{ expense.id }}"
+  hx-swap="outerHTML"
+  class="flex flex-col md:grid md:grid-cols-[100px_1fr_120px_140px_80px] gap-2 md:gap-4 px-4 md:px-6 py-3 bg-surface-alt border-b border-primary/30 items-center">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  
+  <!-- Date -->
+  <div>
+    <input
+      type="date"
+      name="date"
+      value="{{ expense.date }}"
+      required
+      class="w-full bg-surface-inset border border-white/10 px-2 py-1 text-[10px] font-mono rounded-sm text-text-main focus:border-primary outline-none"/>
+  </div>
+
+  <!-- Merchant -->
+  <div>
+    <input
+      type="text"
+      name="merchant"
+      value="{{ expense.merchant }}"
+      required
+      maxlength="100"
+      placeholder="Merchant"
+      class="w-full bg-surface-inset border border-white/10 px-2 py-1 text-xs font-mono rounded-sm text-text-main focus:border-primary outline-none"/>
+  </div>
+
+  <!-- Amount -->
+  <div>
+    <input
+      type="number"
+      step="0.01"
+      name="amount"
+      value="{{ expense.amount }}"
+      required
+      placeholder="0.00"
+      class="w-full bg-surface-inset border border-white/10 px-2 py-1 text-xs font-mono rounded-sm text-text-main focus:border-primary outline-none text-right"/>
+  </div>
+
+  <!-- Category -->
+  <div>
+    <select
+      name="category"
+      class="w-full bg-surface-inset border border-white/10 px-2 py-1 text-[10px] font-mono rounded-sm text-text-main focus:border-primary outline-none">
+      {% for cat in ['Food', 'Transport', 'Shopping', 'Entertainment', 'Health', 'Rent', 'Utilities', 'Miscellaneous'] %}
+      <option value="{{ cat }}" {% if expense.category == cat %}selected{% endif %}>{{ cat }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex justify-end gap-1">
+    <button
+      type="submit"
+      class="w-8 h-8 rounded-sm machined-plate bg-primary text-text-main flex items-center justify-center hover:brightness-110 active:scale-95"
+      title="Save Changes">
+      <span class="material-symbols-outlined text-[16px]">check</span>
+    </button>
+    <button
+      type="button"
+      hx-get="{{ url_for('main.get_expense_row', expense_id=expense.id) }}"
+      hx-target="#expense-row-{{ expense.id }}"
+      hx-swap="outerHTML"
+      class="w-8 h-8 rounded-sm machined-plate text-text-muted hover:text-text-main flex items-center justify-center active:scale-95"
+      title="Cancel">
+      <span class="material-symbols-outlined text-[16px]">close</span>
+    </button>
+  </div>
+</form>
