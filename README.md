@@ -1,10 +1,14 @@
 # Expense Tracking Application
 
 [![CI](https://github.com/mit0506/expense-track/actions/workflows/ci.yml/badge.svg)](https://github.com/mit0506/expense-track/actions/workflows/ci.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/release/python-3100/)
-[![Flask](https://img.shields.io/badge/flask-%23000.svg?style=flat&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
-[![HTMX](https://img.shields.io/badge/HTMX-3366CC?style=flat&logo=htmx&logoColor=white)](https://htmx.org/)
-[![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-2.x-000000?style=flat&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![HTMX](https://img.shields.io/badge/HTMX-1.9.12-3366CC?style=flat&logo=htmx&logoColor=white)](https://htmx.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-CDN-38B2AC?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-ORM-D71F00?style=flat&logo=sqlalchemy&logoColor=white)](https://www.sqlalchemy.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Pytest](https://img.shields.io/badge/Tests-Pytest%20(75%20passed)-0A9EDC?style=flat&logo=pytest&logoColor=white)](https://docs.pytest.org/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-Integrated-412991?style=flat&logo=openai&logoColor=white)](https://openai.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A fast, responsive Flask-based personal finance and expense tracker powered by **HTMX** and **Tailwind CSS**. Features real-time search, inline editing, receipt OCR, transaction SMS parsing, bill splitting, subscription tracking, and visual analytics—with zero frontend build step.
