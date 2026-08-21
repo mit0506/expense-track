@@ -1,4 +1,6 @@
 .env
+.env.*
+!.env.example
 .venv/
 node_modules/
 __pycache__/
@@ -17,6 +19,5 @@ make_avatar.py
 .idea/
 .DS_Store
 .claude
-.env.docker
 .coverage
 .pytest_cache/
