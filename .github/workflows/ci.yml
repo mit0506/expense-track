@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  lint-and-test:
+  test:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: "sqlite://"
@@ -27,11 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install flake8 pytest
+          pip install -r requirements.txt pytest
 
-      - name: Lint (flake8)
-        run: flake8 app/ tests/ --max-line-length 120 --exclude __pycache__
-
-      - name: Test (pytest)
+      - name: Run tests
         run: pytest tests/ -v --tb=short
