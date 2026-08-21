@@ -5,14 +5,15 @@
 .vscode/
 node_modules/
 __pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
 uploads/
 *.db
 *.sqlite3
 instance/
 dist/
 build/
-*.pyc
-*.pyo
 recreate_db.py
 add_table.py
 add_sub.py
