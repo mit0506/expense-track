@@ -1,0 +1,56 @@
+<div id="sms-result-container" class="machined-plate p-6 rounded-md border border-accent-cyan/40 mt-6 relative">
+  <div class="absolute top-0 left-0 w-full h-[2px] bg-accent-cyan"></div>
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-accent-cyan text-[20px]">mark_chat_read</span>
+      <h3 class="text-xs font-mono font-bold uppercase text-text-main">SMS_Telemetry_Parsed</h3>
+    </div>
+    <span class="text-[9px] font-mono text-accent-cyan uppercase px-2 py-0.5 rounded-sm bg-accent-cyan/10 border border-accent-cyan/30">Parsed</span>
+  </div>
+
+  <form method="POST" action="{{ url_for('main.add_manual') }}" class="flex flex-col gap-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-[10px] font-mono text-text-muted uppercase mb-1">Merchant</label>
+        <input type="text" name="merchant" value="{{ merchant }}" required class="w-full bg-surface-inset border border-white/10 px-3 py-2 text-xs font-mono rounded-sm text-text-main focus:border-accent-cyan outline-none"/>
+      </div>
+      <div>
+        <label class="block text-[10px] font-mono text-text-muted uppercase mb-1">Amount (INR)</label>
+        <input type="number" step="0.01" name="amount" value="{{ amount }}" required class="w-full bg-surface-inset border border-white/10 px-3 py-2 text-xs font-mono rounded-sm text-text-main focus:border-accent-cyan outline-none"/>
+      </div>
+      <div>
+        <label class="block text-[10px] font-mono text-text-muted uppercase mb-1">Date</label>
+        <input type="date" name="date" value="{{ date }}" required class="w-full bg-surface-inset border border-white/10 px-3 py-2 text-xs font-mono rounded-sm text-text-main focus:border-accent-cyan outline-none"/>
+      </div>
+      <div>
+        <label class="block text-[10px] font-mono text-text-muted uppercase mb-1">Category</label>
+        <select name="category" class="w-full bg-surface-inset border border-white/10 px-3 py-2 text-xs font-mono rounded-sm text-text-main focus:border-accent-cyan outline-none">
+          {% for cat in ['Food', 'Transport', 'Shopping', 'Entertainment', 'Health', 'Rent', 'Utilities', 'Miscellaneous'] %}
+          <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-[10px] font-mono text-text-muted uppercase mb-1">Payment Method</label>
+      <select name="payment_type" class="w-full bg-surface-inset border border-white/10 px-3 py-2 text-xs font-mono rounded-sm text-text-main focus:border-accent-cyan outline-none">
+        {% for pt in ['Cash', 'UPI', 'Credit Card', 'Debit Card', 'Net Banking'] %}
+        <option value="{{ pt }}" {% if payment_type == pt %}selected{% endif %}>{{ pt }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="flex gap-3 mt-2">
+      <button type="submit" class="machined-button flex-1 h-12 bg-primary text-text-main font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">save</span>
+        Commit Expense
+      </button>
+      <a href="{{ url_for('main.add_sms') }}" class="machined-plate px-4 h-12 flex items-center justify-center font-mono text-[10px] text-text-muted hover:text-text-main uppercase">
+        Parse Another
+      </a>
+    </div>
+  </form>
+</div>
