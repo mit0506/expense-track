@@ -30,7 +30,12 @@
         </div>
         {% endif %}
 
-        <form method="POST" enctype="multipart/form-data" class="flex flex-col gap-8">
+        <form method="POST" enctype="multipart/form-data" 
+              hx-post="{{ url_for('main.upload_receipt') }}"
+              hx-target="#ocr-result-area"
+              hx-indicator="#ocr-spinner"
+              hx-encoding="multipart/form-data"
+              class="flex flex-col gap-8">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <!-- File Input Area -->
             <div class="flex flex-col gap-2">
@@ -69,10 +74,13 @@
             <div class="mt-2">
                 <button type="submit" class="machined-button w-full h-14 bg-accent-cyan text-background-dark font-mono font-bold uppercase tracking-widest flex items-center justify-center gap-2 group hover:bg-accent-cyan/90 transition-colors">
                     <span class="material-symbols-outlined font-bold">microchip</span>
-                    Process Recpt_Node
+                    <span>Process Recpt_Node</span>
+                    <span id="ocr-spinner" class="htmx-indicator material-symbols-outlined animate-spin text-[16px] ml-2">sync</span>
                 </button>
             </div>
         </form>
+
+        <div id="ocr-result-area"></div>
     </div>
 </div>
 
