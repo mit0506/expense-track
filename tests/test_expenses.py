@@ -210,3 +210,128 @@ def test_settle_split(auth_client, app):
     updated_split = BillSplit.query.get(split.id)
     assert updated_split is not None
     assert updated_split.settled is True
+
+
+def test_htmx_expense_table(auth_client):
+    auth_client.post('/add_manual', data={
+        'date': '2026-04-01',
+        'merchant': 'HTMX Table Store',
+        'amount': '250.0',
+        'category': 'Shopping',
+        'payment_type': 'Card',
+    })
+    resp = auth_client.get('/expenses/table', headers={'HX-Request': 'true'})
+    assert resp.status_code == 200
+    assert b'HTMX Table Store' in resp.data
+    assert b'expense-row-' in resp.data
+
+
+def test_htmx_expense_table_filter(auth_client):
+    auth_client.post('/add_manual', data={
+        'date': '2026-04-01',
+        'merchant': 'Groceries Alpha',
+        'amount': '300.0',
+        'category': 'Food',
+        'payment_type': 'Cash',
+    })
+    auth_client.post('/add_manual', data={
+        'date': '2026-04-01',
+        'merchant': 'Metro Ride',
+        'amount': '50.0',
+        'category': 'Transport',
+        'payment_type': 'UPI',
+    })
+    # Filter by category Food
+    resp = auth_client.get('/expenses/table?category=Food', headers={'HX-Request': 'true'})
+    assert resp.status_code == 200
+    assert b'Groceries Alpha' in resp.data
+    assert b'Metro Ride' not in resp.data
+
+    # Filter by search
+    resp_search = auth_client.get('/expenses/table?search=Metro', headers={'HX-Request': 'true'})
+    assert resp_search.status_code == 200
+    assert b'Metro Ride' in resp_search.data
+    assert b'Groceries Alpha' not in resp_search.data
+
+
+def test_htmx_get_expense_row(auth_client):
+    auth_client.post('/add_manual', data={
+        'date': '2026-04-01',
+        'merchant': 'Row Test',
+        'amount': '80.0',
+        'category': 'Health',
+        'payment_type': 'Cash',
+    })
+    expense = Expense.query.filter_by(merchant='Row Test').first()
+    assert expense is not None
+    resp = auth_client.get(f'/expenses/{expense.id}/row', headers={'HX-Request': 'true'})
+    assert resp.status_code == 200
+    assert b'Row Test' in resp.data
+
+
+def test_htmx_add_manual(auth_client):
+    resp = auth_client.post('/add_manual', data={
+        'date': '2026-04-01',
+        'merchant': 'HTMX Add Store',
+        'amount': '42.0',
+        'category': 'Entertainment',
+        'payment_type': 'UPI',
+    }, headers={'HX-Request': 'true'})
+    assert resp.status_code == 200
+    assert b'HTMX Add Store' in resp.data
+    assert b'id="expense-row-' in resp.data
+
+
+def test_htmx_edit_expense_get_and_post(auth_client):
+    auth_client.post('/add_manual', data={
+        'date': '2026-04-01',
+        'merchant': 'HTMX Edit Target',
+        'amount': '99.0',
+        'category': 'Utilities',
+        'payment_type': 'Cash',
+    })
+    expense = Expense.query.filter_by(merchant='HTMX Edit Target').first()
+    assert expense is not None
+
+    # GET inline edit form
+    resp_form = auth_client.get(f'/expenses/{expense.id}/edit', headers={'HX-Request': 'true'})
+    assert resp_form.status_code == 200
+    assert b'name="merchant"' in resp_form.data
+    assert b'HTMX Edit Target' in resp_form.data
+
+    # POST updated data
+    resp_post = auth_client.post(f'/expenses/{expense.id}/edit', data={
+        'date': '2026-04-05',
+        'merchant': 'HTMX Edited Name',
+        'amount': '150.0',
+        'category': 'Utilities',
+        'payment_type': 'UPI',
+    }, headers={'HX-Request': 'true'})
+    assert resp_post.status_code == 200
+    assert b'HTMX Edited Name' in resp_post.data
+
+
+def test_htmx_delete_expense(auth_client):
+    auth_client.post('/add_manual', data={
+        'date': '2026-04-01',
+        'merchant': 'HTMX Delete Target',
+        'amount': '12.0',
+        'category': 'Food',
+        'payment_type': 'Cash',
+    })
+    expense = Expense.query.filter_by(merchant='HTMX Delete Target').first()
+    assert expense is not None
+
+    resp = auth_client.delete(f'/expenses/{expense.id}', headers={'HX-Request': 'true'})
+    assert resp.status_code == 200
+    assert resp.data == b''
+    assert Expense.query.get(expense.id) is None
+
+
+def test_htmx_add_sms_parse(auth_client):
+    sms = "Spent Rs. 450.00 at Starbucks on 2026-04-01 using UPI."
+    resp = auth_client.post('/add_sms', data={'sms_text': sms}, headers={'HX-Request': 'true'})
+    assert resp.status_code == 200
+    assert b'sms-result-container' in resp.data
+    assert b'Starbucks' in resp.data
+
