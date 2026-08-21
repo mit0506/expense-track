@@ -334,3 +334,4 @@ def test_htmx_add_sms_parse(auth_client):
     assert resp.status_code == 200
     assert b'sms-result-container' in resp.data
     assert b'Starbucks' in resp.data
+
