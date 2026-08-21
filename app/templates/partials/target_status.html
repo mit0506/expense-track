@@ -1,0 +1,68 @@
+<section id="metric-dials" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+  <!-- Balance -->
+  <div class="machined-plate rounded-md p-6 relative group h-[130px] flex flex-col justify-between overflow-hidden transition-all hover:-translate-y-1 hover:shadow-primary/10">
+    <div class="flex justify-between items-start">
+      <span class="text-text-muted font-mono text-[11px] tracking-[0.05em] uppercase">Status // Expenditure</span>
+      <span class="material-symbols-outlined text-text-muted text-[18px] group-hover:text-primary transition-colors">account_balance_wallet</span>
+    </div>
+    <div class="flex items-baseline gap-2">
+      <span class="text-text-muted font-mono text-sm opacity-50">₹</span>
+      <span class="font-mono text-4xl font-bold tabular-nums tracking-tight group-hover:text-primary transition-colors">
+        {{ "%.2f"|format(monthly_total) }}
+      </span>
+    </div>
+    <div class="absolute top-0 left-0 w-full h-[2px] bg-primary opacity-30 group-hover:opacity-100 transition-opacity"></div>
+    <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
+  </div>
+
+  <!-- Monthly Target -->
+  <div class="machined-plate rounded-md p-6 relative group h-[130px] flex flex-col justify-between overflow-hidden transition-all hover:-translate-y-1">
+    <div class="flex justify-between items-start">
+      <span class="text-text-muted font-mono text-[11px] tracking-[0.05em] uppercase">System // Target</span>
+      <span class="material-symbols-outlined text-text-muted text-[18px] group-hover:text-accent-cyan transition-colors">target</span>
+    </div>
+    <div class="flex items-baseline gap-2">
+      <span class="text-text-muted font-mono text-sm opacity-50">₹</span>
+      <span class="font-mono text-4xl font-bold tabular-nums tracking-tight group-hover:text-accent-cyan transition-colors">
+        {{ "%.2f"|format(monthly_target_float) if monthly_target_float else "0.00" }}
+      </span>
+    </div>
+    <div class="absolute top-0 left-0 w-full h-[2px] bg-accent-cyan opacity-30 group-hover:opacity-100 transition-opacity"></div>
+    <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-accent-cyan/5 rounded-full blur-2xl group-hover:bg-accent-cyan/10 transition-colors"></div>
+  </div>
+
+  <!-- Remaining -->
+  <div class="machined-plate rounded-md p-6 relative group h-[130px] flex flex-col justify-between overflow-hidden transition-all hover:-translate-y-1">
+    <div class="flex justify-between items-start">
+      <span class="text-text-muted font-mono text-[11px] tracking-[0.05em] uppercase">Capacity // Buffer</span>
+      <span class="material-symbols-outlined text-text-muted text-[18px] group-hover:text-white transition-colors">payments</span>
+    </div>
+    <div class="flex items-baseline gap-2">
+      {% set remaining = (monthly_target_float - monthly_total) if monthly_target_float else 0 %}
+      <span class="{% if remaining < 0 %}text-primary{% else %}text-accent-cyan{% endif %} font-mono text-sm opacity-50">₹</span>
+      <span class="font-mono text-4xl font-bold tabular-nums tracking-tight {% if remaining < 0 %}text-primary animate-pulse{% else %}group-hover:text-white{% endif %} transition-colors">
+        {{ "%.2f"|format(remaining) }}
+      </span>
+    </div>
+    {% set health_color = '#f2542c' if remaining < 0 else '#00e5ff' %}
+    <div class="absolute top-0 left-0 w-full h-[2px] opacity-30 group-hover:opacity-100 transition-opacity" style="background-color: {{ health_color }};"></div>
+    <div class="absolute -right-4 -bottom-4 w-16 h-16 rounded-full blur-2xl transition-colors opacity-[0.05]" style="background-color: {{ health_color }};"></div>
+  </div>
+
+  <!-- Net Balance -->
+  <div class="machined-plate rounded-md p-6 relative group h-[130px] flex flex-col justify-between overflow-hidden transition-all hover:-translate-y-1 hover:shadow-primary/10">
+    <div class="flex justify-between items-start">
+      <span class="text-text-muted font-mono text-[11px] tracking-[0.05em] uppercase">Network // Liquid</span>
+      <span class="material-symbols-outlined text-text-muted text-[18px] group-hover:text-accent-cyan transition-colors">account_tree</span>
+    </div>
+    <div class="flex items-baseline gap-2">
+      <span class="{% if net_balance < 0 %}text-primary{% else %}text-accent-cyan{% endif %} font-mono text-sm opacity-50">₹</span>
+      <span class="font-mono text-4xl font-bold tabular-nums tracking-tight {% if net_balance < 0 %}text-primary{% else %}group-hover:text-accent-cyan{% endif %} transition-colors">
+        {{ "%.2f"|format(net_balance) }}
+      </span>
+    </div>
+    {% set liquid_color = '#f2542c' if net_balance < 0 else '#00e5ff' %}
+    <div class="absolute top-0 left-0 w-full h-[2px] opacity-30 group-hover:opacity-100 transition-opacity" style="background-color: {{ liquid_color }};"></div>
+    <div class="absolute -right-4 -bottom-4 w-16 h-16 rounded-full blur-2xl transition-colors opacity-[0.05]" style="background-color: {{ liquid_color }};"></div>
+  </div>
+</section>

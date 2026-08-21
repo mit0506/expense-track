@@ -114,23 +114,64 @@ def index():
     )
 
 
+@main_bp.route('/expenses/table', methods=['GET'])
+@main_bp.route('/table', methods=['GET'])
+@login_required
+def expense_table():
+    page = request.args.get('page', 1, type=int)
+    category = request.args.get('category', '').strip()
+    search = request.args.get('search', '').strip()
+    per_page = 50
+
+    query = Expense.query.filter_by(user_id=current_user.id)
+    if category and category != 'All':
+        query = query.filter_by(category=category)
+    if search:
+        query = query.filter(Expense.merchant.ilike(f'%{search}%'))
+
+    pagination = (
+        query
+        .order_by(Expense.date.desc(), Expense.id.desc())
+        .paginate(page=page, per_page=per_page, error_out=False)
+    )
+    return render_template(
+        'partials/expense_table.html',
+        expenses=pagination.items,
+        pagination=pagination,
+    )
+
+
+@main_bp.route('/expenses/<int:expense_id>/row', methods=['GET'])
+@login_required
+def get_expense_row(expense_id):
+    expense = Expense.query.filter_by(
+        id=expense_id, user_id=current_user.id).first_or_404()
+    return render_template('partials/expense_row.html', expense=expense)
+
+
 @main_bp.route('/add_manual', methods=['GET', 'POST'])
 @login_required
 def add_manual():
     if request.method == 'POST':
         amount = validate_amount(request.form.get('amount'))
         if amount is None:
+            if request.headers.get('HX-Request'):
+                return Response('<div class="p-2 text-xs text-primary font-mono">Invalid amount. Must be between 0.01 and 9,999,999.99.</div>', status=400)
             flash('Invalid amount. Must be between 0.01 and 9,999,999.99.')
             return redirect(url_for('main.add_manual'))
 
         date_str = validate_date(request.form.get('date', ''))
         if date_str is None:
+            if request.headers.get('HX-Request'):
+                return Response('<div class="p-2 text-xs text-primary font-mono">Invalid date. Use YYYY-MM-DD format.</div>', status=400)
             flash('Invalid date. Use YYYY-MM-DD format.')
             return redirect(url_for('main.add_manual'))
 
         merchant = sanitize_string(
             request.form.get('merchant', ''), max_length=100)
         if not merchant:
+            if request.headers.get('HX-Request'):
+                return Response('<div class="p-2 text-xs text-primary font-mono">Merchant name is required.</div>', status=400)
             flash('Merchant name is required.')
             return redirect(url_for('main.add_manual'))
 
@@ -146,23 +187,32 @@ def add_manual():
         )
         db.session.add(expense)
         db.session.commit()
+
+        if request.headers.get('HX-Request'):
+            return render_template('partials/expense_row.html', expense=expense)
+
         return redirect(url_for('main.index'))
     return render_template('add_manual.html')
 
 
-@main_bp.route('/edit/<int:expense_id>', methods=['GET', 'POST'])
+@main_bp.route('/edit/<int:expense_id>', methods=['GET', 'POST', 'PUT', 'PATCH'])
+@main_bp.route('/expenses/<int:expense_id>/edit', methods=['GET', 'POST', 'PUT', 'PATCH'])
 @login_required
 def edit_expense(expense_id):
     expense = Expense.query.filter_by(
         id=expense_id, user_id=current_user.id).first_or_404()
-    if request.method == 'POST':
+    if request.method in ['POST', 'PUT', 'PATCH']:
         amount = validate_amount(request.form.get('amount', expense.amount))
         if amount is None:
+            if request.headers.get('HX-Request'):
+                return Response('Invalid amount', status=400)
             flash('Invalid amount.')
             return redirect(url_for('main.edit_expense', expense_id=expense_id))
 
         date_str = validate_date(request.form.get('date', expense.date))
         if date_str is None:
+            if request.headers.get('HX-Request'):
+                return Response('Invalid date format', status=400)
             flash('Invalid date format.')
             return redirect(url_for('main.edit_expense', expense_id=expense_id))
 
@@ -175,17 +225,30 @@ def edit_expense(expense_id):
         expense.payment_type = validate_payment_type(
             request.form.get('payment_type', expense.payment_type))
         db.session.commit()
+
+        if request.headers.get('HX-Request'):
+            return render_template('partials/expense_row.html', expense=expense)
+
         return redirect(url_for('main.index'))
+
+    if request.headers.get('HX-Request'):
+        return render_template('partials/expense_row_edit.html', expense=expense)
+
     return render_template('edit_manual.html', expense=expense)
 
 
-@main_bp.route('/delete/<int:expense_id>', methods=['POST'])
+@main_bp.route('/delete/<int:expense_id>', methods=['POST', 'DELETE'])
+@main_bp.route('/expenses/<int:expense_id>', methods=['POST', 'DELETE'])
 @login_required
 def delete_expense(expense_id):
     expense = Expense.query.filter_by(
         id=expense_id, user_id=current_user.id).first_or_404()
     db.session.delete(expense)
     db.session.commit()
+
+    if request.headers.get('HX-Request') or request.method == 'DELETE':
+        return Response('', status=200)
+
     return redirect(url_for('main.index'))
 
 
@@ -218,6 +281,15 @@ def upload_receipt():
                         if not parsed.get('merchant') or float(parsed.get('amount', 0)) <= 0:
                             error = "Could not extract valid data. Try another image or entering manually."
                         else:
+                            if request.headers.get('HX-Request'):
+                                return render_template(
+                                    'partials/receipt_upload_result.html',
+                                    merchant=parsed.get('merchant', ''),
+                                    amount=parsed.get('amount', 0.0),
+                                    date=parsed.get('date', datetime.today().strftime('%Y-%m-%d')),
+                                    category=parsed.get('category', 'Miscellaneous'),
+                                    payment_type=parsed.get('payment_type', 'Cash')
+                                )
                             # Instead of immediately saving, redirect to manual entry with pre-filled fields
                             return redirect(url_for('main.add_manual',
                                                     merchant=parsed.get(
@@ -233,6 +305,10 @@ def upload_receipt():
                 except (OSError, ValueError) as e:
                     logger.error("Error processing receipt: %s", e)
                     error = "Error processing image. Please try again or use manual entry."
+
+    if request.headers.get('HX-Request') and error:
+        return Response(f'<div class="bg-primary/10 border border-primary/30 p-3 rounded-sm text-xs text-primary font-mono">{error}</div>', status=400)
+
     return render_template('upload.html', error=error)
 
 
@@ -242,9 +318,22 @@ def add_sms():
     if request.method == 'POST':
         sms_text = request.form.get('sms_text', '')
         if not sms_text.strip():
+            if request.headers.get('HX-Request'):
+                return Response('<div class="bg-primary/10 border border-primary/30 p-3 rounded-sm text-xs text-primary font-mono">Please enter SMS text.</div>', status=400)
             flash('Please enter SMS text.')
             return redirect(url_for('main.add_sms'))
         parsed = parse_sms(sms_text)
+
+        if request.headers.get('HX-Request'):
+            return render_template(
+                'partials/sms_parse_result.html',
+                merchant=parsed.get('merchant', ''),
+                amount=parsed.get('amount', 0.0),
+                date=parsed.get('date', datetime.today().strftime('%Y-%m-%d')),
+                category=parsed.get('category', 'Miscellaneous'),
+                payment_type=parsed.get('payment_type', 'Cash')
+            )
+
         expense = _create_expense_from_parsed(parsed)
         db.session.add(expense)
         db.session.commit()
