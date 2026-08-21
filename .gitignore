@@ -22,3 +22,4 @@ make_avatar.py
 .claude
 .coverage
 .pytest_cache/
+plan.md
