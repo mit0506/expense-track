@@ -1,0 +1,10 @@
+{
+    "python.defaultInterpreterPath": "C:\\Code\\expense-track\\.venv\\Scripts\\python.exe",
+    "python.analysis.extraPaths": [
+        "C:\\Code\\expense-track"
+    ],
+    "python.analysis.autoSearchPaths": true,
+    "python.languageServer": "Pylance",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.diagnosticMode": "workspace"
+}
