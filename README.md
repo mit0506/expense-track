@@ -3,98 +3,167 @@
 [![CI](https://github.com/mit0506/expense-track/actions/workflows/ci.yml/badge.svg)](https://github.com/mit0506/expense-track/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![Flask](https://img.shields.io/badge/flask-%23000.svg?style=flat&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![HTMX](https://img.shields.io/badge/HTMX-3366CC?style=flat&logo=htmx&logoColor=white)](https://htmx.org/)
 [![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=flat&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A modern, responsive Flask-based expense tracker featuring manual entry, receipt OCR, SMS parsing, and visual insights.
+A fast, responsive Flask-based personal finance and expense tracker powered by **HTMX** and **Tailwind CSS**. Features real-time search, inline editing, receipt OCR, transaction SMS parsing, bill splitting, subscription tracking, and visual analytics—with zero frontend build step.
 
 ![Dashboard Preview](assets/Dashboard%20-%20Expense%20Tracker.png)
 
-## Features
+---
 
-- **Responsive Dashboard**: Track your spending at a glance.
-- **Receipt OCR**: Upload receipt images to automatically extract merchant, date, and amount using Tesseract OCR.
-- **SMS Parsing**: Paste transaction SMS text to quickly add expenses.
-- **Visual Analytics**: Interactive pie and bar charts for category-wise and date-wise spending analysis.
-- **AI Chatbot**: Optional integration with OpenAI for asking questions about your spending.
-- **Monthly Targets**: Set and monitor monthly spending limits.
+## ✨ Features
 
-## Prerequisites
+- **⚡ Reactive HTMX UI**: Seamless dynamic updates (live search, category filters, pagination, inline editing, and row deletion) without page reloads.
+- **🧾 Receipt OCR Scanning**: Upload receipt images to automatically extract merchant, date, and amount via Tesseract OCR.
+- **💬 SMS Transaction Parsing**: Paste raw bank/card SMS alerts to auto-fill expense entries.
+- **📊 Visual Analytics**: Interactive charts for category breakdowns, monthly budgets, and spending trends.
+- **👥 Bill Splitting & Subscriptions**: Track shared expenses with friends and manage recurring subscription renewals.
+- **🤖 AI Financial Chatbot**: Integrated OpenAI assistant to query your spending habits and gain financial insights.
+- **🎯 Monthly Targets & Health Indicators**: Set category-level limits and visual progress dials.
+- **🔒 Secure & Containerized**: Built-in CSRF protection, rate limiting, and single-stage Docker deployment.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Backend**: Python 3.10+, Flask, Flask-SQLAlchemy, Flask-Login, Flask-WTF, Flask-Migrate, Flask-Limiter
+- **Frontend**: Jinja2 Templates, HTMX, Tailwind CSS (CDN), Custom Machined Tactile Theme
+- **Data & OCR**: SQLite / MySQL / PostgreSQL (via SQLAlchemy), Pillow, Tesseract OCR
+- **Testing & CI**: Pytest, GitHub Actions CI/CD (lightweight, automated test suite)
+- **Container**: Docker (Python 3.14-slim base) & Docker Compose
+
+---
+
+## 📁 Project Structure
+
+```text
+expense-track/
+├── app/
+│   ├── routes/               # Modular Flask blueprints
+│   │   ├── auth.py           # User authentication & registration
+│   │   ├── expenses.py       # Expense CRUD, HTMX table/inline edit endpoints
+│   │   ├── api.py            # JSON REST APIs & AI chatbot endpoints
+│   │   ├── subscriptions.py  # Recurring subscriptions & bill split routes
+│   │   └── __init__.py
+│   ├── templates/            # Jinja2 HTML templates
+│   │   ├── partials/         # HTMX swappable HTML fragments
+│   │   │   ├── expense_row.html        # Individual table row with inline triggers
+│   │   │   ├── expense_row_edit.html   # Inline edit row form
+│   │   │   ├── expense_table.html      # Searchable, filterable expense table
+│   │   │   ├── receipt_upload_result.html # OCR result preview form
+│   │   │   ├── sms_parse_result.html   # SMS parse result form
+│   │   │   └── target_status.html      # Monthly budget & health metric dials
+│   │   ├── base.html         # Base layout with HTMX & Tailwind CDN
+│   │   └── index.html        # Main dashboard view
+│   ├── static/
+│   │   └── css/
+│   │       └── custom.css    # Tactile theme variables & HTMX swap animations
+│   ├── models.py             # SQLAlchemy database models
+│   ├── utils.py              # OCR extraction, SMS parser, & analytics helpers
+│   ├── validators.py         # Input validation & sanitization
+│   ├── constants.py          # Category and payment method definitions
+│   └── __init__.py           # Application factory & extension initialization
+├── migrations/               # Alembic database migration scripts
+├── scripts/                  # Helper & database initialization scripts
+│   ├── init_db.py
+│   └── generate_default_avatar.py
+├── tests/                    # Pytest test suite (75+ unit & integration tests)
+├── .env.example              # Template for environment variables
+├── Dockerfile                # Single-stage Python container
+├── docker-compose.yml        # Multi-container orchestration
+├── requirements.txt          # Python dependencies
+└── run.py                    # Application entrypoint
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
 
 - **Python 3.10+**
-- **Tesseract OCR**: Required for receipt scanning.
+- **Tesseract OCR** (required for receipt image scanning):
+  - [Tesseract OCR Installation Guide](docs/TESSERACT_INSTALLATION.md)
   - [Download Tesseract for Windows](https://github.com/UB-Mannheim/tesseract/wiki)
 
-## Setup Instructions
+---
+
+### Local Installation
 
 1. **Clone the Repository**
-
    ```bash
-   git clone <your-repository-url>
+   git clone https://github.com/mit0506/expense-track.git
    cd expense-track
    ```
 
-2. **Create a Virtual Environment**
-
-   ```powershell
-   python -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   ```
+2. **Create & Activate Virtual Environment**
+   - **PowerShell**:
+     ```powershell
+     python -m venv .venv
+     .\.venv\Scripts\Activate.ps1
+     ```
+   - **Linux / macOS / Git Bash**:
+     ```bash
+     python3 -m venv .venv
+     source .venv/bin/activate
+     ```
 
 3. **Install Dependencies**
-
-   ```powershell
+   ```bash
    pip install -r requirements.txt
    ```
 
-4. **Initialize the Database**
+4. **Configure Environment Variables**
+   Copy the example `.env` file and adjust your settings:
+   ```bash
+   cp .env.example .env
+   ```
+   *(On Windows PowerShell: `Copy-Item .env.example .env`)*
 
-   ```powershell
+5. **Initialize Database**
+   ```bash
    python scripts/init_db.py
    ```
 
-5. **Configure VS Code (Recommended)**
-   - The project includes a `.vscode/settings.json` to automatically detect the virtual environment.
-   - If prompted, select the Python Interpreter located at `.venv\Scripts\python.exe`.
-
-6. **Run the Application**
-   ```powershell
+6. **Run the Development Server**
+   ```bash
    python run.py
    ```
-   Open `http://127.0.0.1:5000` in your browser.
+   Access the app at: **`http://127.0.0.1:5000`**
 
-## Docker Deployment
+---
 
-You can build and run your own Docker container for this application to easily deploy it to any environment.
+## 🧪 Running Tests
 
-1. **Build the Docker Image**
+Run the full automated test suite using `pytest`:
+
+```bash
+pytest tests/ -v --tb=short
+```
+
+---
+
+## 🐳 Docker Deployment
+
+You can run the full application using Docker and Docker Compose without manual Python setup:
+
+1. **Build and Run with Docker Compose**
    ```bash
-   docker build -t expense-track-web .
+   docker compose up --build
    ```
 
-2. **Run the Container (Using Docker Compose)**
-   We recommend using `docker-compose` to automatically manage the container and database volume:
-   ```bash
-   docker-compose up --build
-   ```
-   This will start the application on port **5173**. Open `http://localhost:5173` in your browser.
-## Project Structure
+2. Access the application at **`http://localhost:5173`** (or configured port).
 
-- `app/`: The core application package.
-  - `models.py`: Database schema.
-  - `routes.py`: Flask Blueprints and routes.
-  - `utils.py`: OCR, parsing, and analytics logic.
-  - `static/`: Frontend assets (CSS, JS, images).
-  - `templates/`: HTML templates.
-- `docs/`: Supplementary guides (e.g., Tesseract Installation).
-- `scripts/`: Initialization and maintenance scripts.
-- `run.py`: The entry point script to start the server.
-- `uploads/`: Storage for processed receipt images.
+---
 
-## Documentation
+## 📖 Documentation
 
 - [Tesseract OCR Installation Guide](docs/TESSERACT_INSTALLATION.md)
 
-## License
+---
+
+## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
