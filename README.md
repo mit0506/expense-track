@@ -13,6 +13,9 @@
 
 A fast, responsive Flask-based personal finance and expense tracker powered by **HTMX** and **Tailwind CSS**. Features real-time search, inline editing, receipt OCR, transaction SMS parsing, bill splitting, subscription tracking, and visual analytics—with zero frontend build step.
 
+### What is HTMX
+HTMX is a **lightweight** open-source JavaScript library that lets you build modern, interactive user interfaces directly in HTML using custom attributes. It's best for lightweight **CRUD** apps like this application.
+
 ![Dashboard Preview](assets/Dashboard%20-%20Expense%20Tracker.png)
 
 ---
