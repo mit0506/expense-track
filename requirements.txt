@@ -12,4 +12,4 @@ Werkzeug
 Flask-Bcrypt
 fpdf2
 gunicorn
-openai>=3.19.2
+openai>=3.22.1
